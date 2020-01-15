@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200117 =
+* Use wp_remote_get and wp_remote_post instead of file_get_contents. Thanks to @maikewng for his help in understanding the problem.
+
 = 20200116 =
 * Bug fixed: when start and end time of event are the same, the event.end is null. Now I use the event.start in that case.
 
