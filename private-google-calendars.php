@@ -3,14 +3,14 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200117
+Version: 20200209
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200117');
+define('PGC_PLUGIN_VERSION', '20200209');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -94,7 +94,10 @@ function pgc_register_block() {
   ));
 
   // Make the selected calendars available for the block.
-  $selectedCalendarIds = get_option('pgc_selected_calendar_ids', []);
+  $selectedCalendarIds = get_option('pgc_selected_calendar_ids');
+  if (empty($selectedCalendarIds)) {
+    $selectedCalendarIds = [];
+  }
   $calendarList = getDecoded('pgc_calendarlist', []);
   $selectedCalendars = [];
   foreach ($calendarList as $calendar) {
@@ -1003,7 +1006,11 @@ function pgc_settings_init() {
     '<label for="pgc_public_calendarlist">Public calendars</label>',
     function() {
         ?><table class="pgc-public-calendar-table"><tr><th>Calendar ID</th><th>Title</th><th>Color</th><th>Delete</th></tr><?php
-        $publicCalendars = get_option('pgc_public_calendarlist', []);
+        $publicCalendars = get_option('pgc_public_calendarlist');
+        // $publicCalendars can be empty string
+        if (empty($publicCalendars)) {
+          $publicCalendars = [];
+        }
         $counter = 0;
         foreach ($publicCalendars as $publicCalendar) { ?>
         <tr class="pgc-public-calendar-row" data-source-id="<?php echo esc_attr($publicCalendar['id']); ?>">
