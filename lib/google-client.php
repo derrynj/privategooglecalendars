@@ -45,28 +45,40 @@ class PGC_GoogleClient_Request {
    * @throws PGC_GoogleClient_RequestException
    **/
   public static function doRequest($url, $params = [], $method = 'GET', $headers = []) {
-    $options = [
-      'http' => [
-        'method' => $method,
-        'header' => $headers,
-        'ignore_errors' => true
-      ]
-    ];
-    if (!empty($params)) {
-      if ($method === 'POST') {
-        $options['http']['content'] = http_build_query($params);
-      } else {
-        $url .= '?' . http_build_query($params);
-      }
+
+    $args = [];
+    if (!empty($headers)) {
+      $args['headers'] = $headers;
     }
-    
-    $context  = stream_context_create($options);
-    $result = file_get_contents($url, false, $context);
+
+    $result = null;
+    switch ($method) {
+      case 'GET':
+        if (!empty($params)) {
+          $url .= '?' . http_build_query($params); // urlencoded is done for you
+          //$url = add_query_arg($params, $url); // wp variant, but I think you still have to urlencode it
+        }
+        $result = wp_remote_get($url, $args);
+      break;
+      case 'POST':
+        if (!empty($params)) {
+          $args['body'] = $params; // TODO: Do we have to urlencode these manually?
+        }
+        $result = wp_remote_post($url, $args);
+      break;
+      default:
+        throw new PGC_GoogleClient_RequestException('Unknown request method.');
+    }
     
     if (empty($result)) {
       throw new PGC_GoogleClient_RequestException('Request failed.');
     }
-    $decodedResult = json_decode($result, true);
+
+    if (is_wp_error($result)) {
+      throw new PGC_GoogleClient_RequestException($result->get_error_message());
+    }
+
+    $decodedResult = json_decode(wp_remote_retrieve_body($result), true);
     if (is_null($decodedResult)) {
       throw new PGC_GoogleClient_RequestException('Response is invalid JSON.', 0, $result);
     }
@@ -214,7 +226,7 @@ class PGC_GoogleClient {
       'redirect_uri' => $this->redirectUri,
       'grant_type' => 'authorization_code'
     ], 'POST', [
-      'Content-Type: application/x-www-form-urlencoded'
+      'Content-Type' => 'application/x-www-form-urlencoded'
     ]);
 
     $this->updateTokens($result);
@@ -246,7 +258,7 @@ class PGC_GoogleClient {
       ],
       'POST',
       [
-        'Content-Type: application/x-www-form-urlencoded'
+        'Content-Type' => 'application/x-www-form-urlencoded'
       ]
     );
     $this->updateTokens($result);
@@ -296,7 +308,25 @@ class PGC_GoogleCalendarClient {
       $params,
       'GET',
       [
-        'Authorization: Bearer ' . $this->googleClient->getAccessToken(),
+        'Authorization' => 'Bearer ' . $this->googleClient->getAccessToken(),
+      ]
+    );
+    
+    $parsed = !empty($result['items']) ? $result['items'] : [];
+    return $parsed;
+  }
+
+  public function getEventsPublic($calendarId, $params, $apiKey, $referer) {
+    $url = str_replace('$calendarId', urlencode($calendarId), self::GOOGLE_CALENDAR_EVENTS_URI);
+    // https://developers.google.com/google-apps/calendar/performance#partial-response
+    $params['fields'] = "items(summary,description,start,end,htmlLink,creator,location,attendees,attachments)";
+    $params['key'] = $apiKey;
+    $result = PGC_GoogleClient_Request::doRequest(
+      $url,
+      $params,
+      'GET',
+      [
+        'Referer' => $referer
       ]
     );
     
@@ -328,7 +358,7 @@ class PGC_GoogleCalendarClient {
       ],
       'GET',
       [
-        'Authorization: Bearer ' . $this->googleClient->getAccessToken()
+        'Authorization' => 'Bearer ' . $this->googleClient->getAccessToken()
       ]
     );
     $parsed = !empty($result['items']) ? $result['items'] : [];

@@ -70,6 +70,7 @@
 
     // Always present, gets set in PHP file.
     // Note: make sure you use the same defaults as get set in the PHP file!
+    var isPublic = castAttrValue($calendar.getAttribute('data-public'), false);
     var filter = castAttrValue($calendar.getAttribute('data-filter'));
     var showEventPopup = castAttrValue($calendar.getAttribute('data-eventpopup'), true);
     var showEventLink = castAttrValue($calendar.getAttribute('data-eventlink'), false);
@@ -115,10 +116,15 @@
     // Only in widget set (data-calendarids)
     var thisCalendarids = $calendar.getAttribute('data-calendarids') ? JSON.parse($calendar.getAttribute('data-calendarids')) : [];
     // Only in shortcode
+    // TODO: with new release this can be deleted I think.
     if ("calendarids" in config) {
       thisCalendarids = config.calendarids.split(",").map(function(item) {
         return item.replace(" ", "");
       });
+    }
+
+    if (isPublic && thisCalendarids.length === 0) {
+      console.error("If you set the 'public' property, you have to specify at least 1 calendar ID in the 'calendarids' property.");
     }
 
     function handleCalendarFilter(calendars) {
@@ -140,7 +146,7 @@
         }
         selectBoxes.push('<input id="id_' + calendarCounter + '_' + index + '" type="checkbox" checked value="' + key + '" />'
           + '<label for="id_' + calendarCounter + '_' + index + '">'
-          + '<span class="pgc-calendar-color" style="background-color:' + (getConfigBackgroundColor(config) || calendars[key].backgroundColor) + '"></span> ' + calendars[key].summary
+          + '<span class="pgc-calendar-color" style="background-color:' + (getConfigBackgroundColor(config) || calendars[key].backgroundColor) + '"></span> ' + (calendars[key].summary || key)
           + '</label>');
       });
       $calendarFilter.innerHTML = '<div class="pgc-calendar-filter-wrapper">' + selectBoxes.join("\n") + '</div>';
@@ -209,13 +215,15 @@
             texts.push("All day</div></div>");
           } else {
             if (config.timeZone) {
+              // info.event.end can be null, for example when someone uses the same start and end time!
               texts.push(moment.tz(info.event.start, config.timeZone).format("LT")
                 + " - "
-                + moment.tz(info.event.end, config.timeZone).format("LT") + "</div></div>");
+                + moment.tz((info.event.end || info.event.start), config.timeZone).format("LT") + "</div></div>");
             } else {
+              // info.event.end can be null, for example when someone uses the same start and end time!
               texts.push(info.event.start.toLocaleTimeString(locale, {
                 timeStyle: "short"
-              }) + " - " + info.event.end.toLocaleTimeString(locale, {
+              }) + " - " + (info.event.end || info.event.start).toLocaleTimeString(locale, {
                 timeStyle: "short"
               }) + "</div></div>");
             }
@@ -240,7 +248,7 @@
           if (showEventCalendarname || hasCreator) {
             texts.push('<div class="pgc-popup-row pgc-event-calendarname-creator"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-calendar-alt"></span></div><div class="pgc-popup-row-value">');
             if (showEventCalendarname) {
-              texts.push(allCalendars[info.event.extendedProps.calId].summary);
+              texts.push(allCalendars[info.event.extendedProps.calId].summary || info.event.extendedProps.calId);
               if (hasCreator) {
                 texts.push('<br>');
               }
@@ -270,6 +278,9 @@
         formData.append("start", fStart);
         formData.append("end", fEnd);
         formData.append("thisCalendarids", thisCalendarids.join(","));
+        if (isPublic) {
+          formData.append("isPublic", 1);
+        }
         xhr.onload = function(eLoad) {
           try {
             var response = JSON.parse(this.response);

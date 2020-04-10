@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.3
+Tested up to: 5.3.2
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -12,13 +12,13 @@ Display multiple private Google Calendars
 
 == Description ==
 
-This plugin can display multiple private Google calendars with a shortcode or as a widget.
+This plugin can display multiple private (and public) Google calendars with a shortcode, Gutenberg block or as a widget.
 
 = Features =
 
-* Access to _private_ calendars by using OAuth2.
+* Access to _private_ (and public) calendars by using OAuth2 or an API key.
 * Adjustable caching - this can greatly improve the performance.
-* It uses the [FullCalendar](https://fullcalendar.io/) library to show the calendar and can be fully customized with shorcode attributes and in the widget settings.
+* It uses the [FullCalendar](https://fullcalendar.io/) library to show the calendar and can be fully customized within the Gutenberg block, shorcode attributes and the widget settings.
 * Calendar filtering.
 
 == Installation ==
@@ -29,6 +29,10 @@ This plugin can display multiple private Google calendars with a shortcode or as
 4. See the Help tab in the settings screen for information about setting up the OAuth2 access and using the shortcode and/or widget.
 
 == Frequently Asked Questions ==
+
+= Where can I find more information? =
+
+See the [website](https://blog.michielvaneerd.nl/private-google-calendars/) for more information.
 
 = How can I override the calendar look? =
 
@@ -42,7 +46,7 @@ This usually means you don't have a valid access or refresh token anymore. This 
 
 = I get an 'Error: redirect_uri_mismatch' error when I want to authorize =
 
-This means that you didn't add your current URL [YOURWEBSITE]/wp-admin/options-general.php?page=pgc to the authorized redirect URIs as explained in the Getting Started section of the Help tab in the Settings screen.
+This means that you didn't add your current URL [YOURWEBSITE]/wp-admin/options-general.php?page=pgc to the authorized redirect URIs. See the [website](https://blog.michielvaneerd.nl/private-google-calendars/) for more information.
 
 = W3 Total Cache =
 
@@ -57,6 +61,33 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/mai
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
 
 == Changelog ==
+
+= 20200209 =
+* Small bug fix: check for empty string when expecting array in get_option() call.
+
+= 20200117 =
+* Use wp_remote_get and wp_remote_post instead of file_get_contents. Thanks to @maikewng for his help in understanding the problem.
+
+= 20200116 =
+* Bug fixed: when start and end time of event are the same, the event.end is null. Now I use the event.start in that case.
+
+= 20200115 =
+* Bug when submitting settings where file select input was not correctly checked, now this check is disabled because we can also have public calendars.
+* Added a Plugin settings link to the plugin page.
+
+= 20200114 =
+* You can now specify title and color for public calendars.
+* Bug in widget fixed: when no private calendar was selected in settings, all private calendars were displayed in the widget form.
+
+= 20200113 =
+* Adding referer to public calendar calls to handle restrictions on API key.
+
+= 20200112 =
+* Now also access to public calendars with an API key instead of more difficult to setup OAuth2
+* Small layout changes
+
+= 20200102 =
+* Gutenberg block implemented (you can use this instead of the shortcode)
 
 = 20191211 =
 * Hidepassed and hidefuture accept number of days as well
