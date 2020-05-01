@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200501 =
+* Prepare for translation.
+
 = 20200209 =
 * Small bug fix: check for empty string when expecting array in get_option() call.
 
