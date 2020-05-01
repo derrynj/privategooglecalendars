@@ -7,6 +7,7 @@ Version: 20200209
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
+Text Domain: private-google-calendars
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
@@ -18,21 +19,21 @@ if (!class_exists('PGC_GoogleClient')) {
 
 define('PGC_PLUGIN_NAME', __('Private Google Calendars'));
 
-define('PGC_NOTICES_VERIFY_SUCCESS', __('Verify OK!'));
-define('PGC_NOTICES_REVOKE_SUCCESS', __('Access revoked. This plugin does not have access to your calendars anymore.'));
-define('PGC_NOTICES_REMOVE_SUCCESS', sprintf(__('Plugin data removed. Make sure to also manually revoke access to your calendars in the Google <a target="__blank" href="%s">Permissions</a> page!'), 'https://myaccount.google.com/permissions'));
-define('PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS', __('Calendars updated.'));
-define('PGC_NOTICES_CACHE_DELETED', __('Cache deleted.'));
+define('PGC_NOTICES_VERIFY_SUCCESS', __('Verify OK!', 'private-google-calendars'));
+define('PGC_NOTICES_REVOKE_SUCCESS', __('Access revoked. This plugin does not have access to your calendars anymore.', 'private-google-calendars'));
+define('PGC_NOTICES_REMOVE_SUCCESS', sprintf(__('Plugin data removed. Make sure to also manually revoke access to your calendars in the Google <a target="__blank" href="%s">Permissions</a> page!', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
+define('PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS', __('Calendars updated.', 'private-google-calendars'));
+define('PGC_NOTICES_CACHE_DELETED', __('Cache deleted.', 'private-google-calendars'));
 
-define('PGC_ERRORS_CLIENT_SECRET_MISSING', __('No client secret.'));
-define('PGC_ERRORS_CLIENT_SECRET_INVALID', __('Invalid client secret.'));
-define('PGC_ERRORS_ACCESS_TOKEN_MISSING', __('No access token.'));
-define('PGC_ERRORS_REFRESH_TOKEN_MISSING', sprintf(__('Your refresh token is missing!<br><br>This can only be solved by manually revoking this plugin&#39;s access in the Google <a target="__blank" href="%s">Permissions</a> page and remove all plugin data.'), 'https://myaccount.google.com/permissions'));
-define('PGC_ERRORS_ACCESS_REFRESH_TOKEN_MISSING', __('No access and refresh tokens.'));
-define('PGC_ERRORS_REDIRECT_URI_MISSING', __('URI <code>%s</code> missing in the client secret file. Adjust your Google project and upload the new client secret file.'));
-define('PGC_ERRORS_INVALID_FORMAT', __('Invalid format'));
-define('PGC_ERRORS_NO_CALENDARS', __('No calendars'));
-define('PGC_ERRORS_NO_SELECTED_CALENDARS',  __('No selected calendars'));
+define('PGC_ERRORS_CLIENT_SECRET_MISSING', __('No client secret.', 'private-google-calendars'));
+define('PGC_ERRORS_CLIENT_SECRET_INVALID', __('Invalid client secret.', 'private-google-calendars'));
+define('PGC_ERRORS_ACCESS_TOKEN_MISSING', __('No access token.', 'private-google-calendars'));
+define('PGC_ERRORS_REFRESH_TOKEN_MISSING', sprintf(__('Your refresh token is missing!<br><br>This can only be solved by manually revoking this plugin&#39;s access in the Google <a target="__blank" href="%s">Permissions</a> page and remove all plugin data.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
+define('PGC_ERRORS_ACCESS_REFRESH_TOKEN_MISSING', __('No access and refresh tokens.', 'private-google-calendars'));
+define('PGC_ERRORS_REDIRECT_URI_MISSING', __('URI <code>%s</code> missing in the client secret file. Adjust your Google project and upload the new client secret file.', 'private-google-calendars'));
+define('PGC_ERRORS_INVALID_FORMAT', __('Invalid format', 'private-google-calendars'));
+define('PGC_ERRORS_NO_CALENDARS', __('No calendars', 'private-google-calendars'));
+define('PGC_ERRORS_NO_SELECTED_CALENDARS',  __('No selected calendars', 'private-google-calendars'));
 
 define('PGC_TRANSIENT_PREFIX', 'pgc_ev_');
 define('PGC_EVENTS_MAX_RESULTS', 100);
@@ -61,11 +62,11 @@ if (is_admin()) {
 
 function pgc_add_plugin_settings_links($links) {
   if (!is_network_admin()) {
-    $link = '<a href="options-general.php?page=pgc">'.__('Plugin settings').'</a>';
+    $link = '<a href="options-general.php?page=pgc">'.__('Plugin settings', 'private-google-calendars').'</a>';
     array_unshift($links, $link);
   } else {
     // switch_to_blog(1);
-    $link = '<a href="' . admin_url('options-general.php').'?page=pgc">' . __('Plugin settings').'</a>';
+    $link = '<a href="' . admin_url('options-general.php').'?page=pgc">' . __('Plugin settings', 'private-google-calendars').'</a>';
     // restore_current_blog();
     array_unshift($links, $link);
   }
@@ -309,6 +310,11 @@ function pgc_enqueue_scripts() {
   wp_localize_script('pgc', 'pgc_object', [
     'ajax_url' => admin_url('admin-ajax.php'),
     'nonce' => $nonce,
+    'trans' => [
+      'all_day' => __('All day', 'private-google-calendars'),
+      'created_by' => __('Created by', 'private-google-calendars'),
+      'go_to_event' => __('Go to event', 'private-google-calendars')
+    ]
   ]);
   
 }
@@ -542,7 +548,7 @@ function pgc_settings_page_html() {
   ?>
   <div class="wrap">
   <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-  <p><?php _e('See the <a class="pgc-link" href="https://blog.michielvaneerd.nl/private-google-calendars/" target="_blank">website</a> for information.'); ?></p>
+  <p><?php _e('See the <a class="pgc-link" href="https://blog.michielvaneerd.nl/private-google-calendars/" target="_blank">website</a> for information.', 'private-google-calendars'); ?></p>
   <?php
     
     $clientSecretError = '';
@@ -557,30 +563,21 @@ function pgc_settings_page_html() {
       $refreshToken = get_option('pgc_refresh_token');
 
       if (empty($accessToken)) {
-        echo '<h2>Setting up private calendar access...</h2>';
-        echo '<h2 style="opacity:1; color:green;">' . __('Step 1: Upload client secret') . ' &#10003;</h2>';
-        echo '<h2>' . __('Step 2: Authorize') . '</h2>';
+        echo '<h2>' . __('Setting up private calendar access', 'private-google-calendars') . '</h2>';
+        echo '<h2 style="opacity:1; color:green;">' . __('Step 1: Upload client secret', 'private-google-calendars') . ' &#10003;</h2>';
+        echo '<h2>' . __('Step 2: Authorize', 'private-google-calendars') . '</h2>';
         ?>
         <form style="display:inline" method="post" action="<?php echo admin_url('admin-post.php'); ?>">
           <input type="hidden" name="action" value="pgc_authorize">
-          <?php submit_button(__('Authorize'), 'primary', 'pgc_authorize', false); ?>
+          <?php submit_button(__('Authorize', 'private-google-calendars'), 'primary', 'pgc_authorize', false); ?>
         </form>
         <form style="display:inline" method="post" action="<?php echo admin_url('admin-post.php'); ?>">
           <input type="hidden" name="action" value="pgc_remove_private">
-          <?php submit_button(__('Stop'), '', 'pgc_remove_private', false); ?>
+          <?php submit_button(__('Stop', 'private-google-calendars'), '', 'pgc_remove_private', false); ?>
         </form>
         <?php
       } else {
-        // CalendarList
         $okay = get_option('pgc_selected_calendar_ids') ? '&#10003;' : '';
-        // echo '<h2 style="opacity:1; color:green;">' . __('Step 1: Upload client secret') . ' &#10003;</h2>';
-        // echo '<h2 style="opacity:1; color:green;">' . __('Step 2: Authorize') . ' &#10003;</h2>';
-        if (get_option('pgc_selected_calendar_ids')) {
-          //echo '<h2 style="opacity:1; color:green;">' . __('Step 3: Select calendars') . ' &#10003;</h2>';
-        } else {
-          //echo '<h2>' . __('Step 3: Select calendars') . '</h2>';
-        }
-        //echo '<p>' . __('Select the calendars you want to display.') . '</p>';
         pgc_show_settings();
       }
     }
@@ -603,7 +600,7 @@ function pgc_settings_page_html() {
       method="post" id="pgc-settings-form" onsubmit="return pgc_on_submit();">
     <?php settings_fields('pgc'); ?>
     <?php do_settings_sections('pgc'); ?>
-    <?php submit_button(__('Save settings'), 'primary', 'pgc-settings-submit'); ?>
+    <?php submit_button(__('Save settings', 'private-google-calendars'), 'primary', 'pgc-settings-submit'); ?>
   </form>
   <?php
 }
@@ -628,21 +625,21 @@ function pgc_show_tools() {
   
   ?>
 
-  <h2><?php _e('Update calendars'); ?></h2>
-  <p><?php _e('Use this when you add or remove calendars in your Google account.'); ?></p>
+  <h2><?php _e('Update calendars', 'private-google-calendars'); ?></h2>
+  <p><?php _e('Use this when you add or remove calendars in your Google account.', 'private-google-calendars'); ?></p>
       <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
         <input type="hidden" name="action" value="pgc_calendarlist">
         <?php submit_button(__('Update calendars'), 'small', 'submit-calendarlist', false); ?>
       </form>
 
-  <h2><?php _e('Verify'); ?></h2>
-  <p><?php _e('Verify if have setup everything correctly.'); ?></p>
+  <h2><?php _e('Verify', 'private-google-calendars'); ?></h2>
+  <p><?php _e('Verify if have setup everything correctly.', 'private-google-calendars'); ?></p>
   <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_verify">
-  <?php submit_button(__('Verify'), 'small', 'submit-verify', false); ?>
+  <?php submit_button(__('Verify', 'private-google-calendars'), 'small', 'submit-verify', false); ?>
   </form>
       
-  <h2><?php _e('Cache'); ?></h2>
+  <h2><?php _e('Cache', 'private-google-calendars'); ?></h2>
   <?php
   $cachedEvents = $wpdb->get_var("SELECT option_name FROM " . $wpdb->options
       . " WHERE option_name LIKE '_transient_timeout_" . PGC_TRANSIENT_PREFIX . "%' OR option_name LIKE '_transient_" . PGC_TRANSIENT_PREFIX . "%' LIMIT 1");
@@ -651,29 +648,29 @@ function pgc_show_tools() {
     $cacheArgs['disabled'] = true;
   }
   ?>
-  <p><?php _e('Remove cached calendar events.'); ?></p>
+  <p><?php _e('Remove cached calendar events.', 'private-google-calendars'); ?></p>
   <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_deletecache">
   <?php
   submit_button(__('Remove cache'), 'small', 'submit-deletecache', false, $cacheArgs);
   if (empty($cachedEvents)) { ?>
-    <em><?php _e('Cache is empty.'); ?></em>
+    <em><?php _e('Cache is empty.', 'private-google-calendars'); ?></em>
   <?php } ?>
   </form>
   
 
-    <h2><?php _e('Revoke access'); ?></h2>
-    <p><?php _e('Revoke this plugins access to your private calendars.'); ?></p>
+    <h2><?php _e('Revoke access', 'private-google-calendars'); ?></h2>
+    <p><?php _e('Revoke this plugins access to your private calendars.', 'private-google-calendars'); ?></p>
 <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_revoke">
-  <?php submit_button(__('Revoke access'), 'small', 'submit-revoke', false); ?>
+  <?php submit_button(__('Revoke access', 'private-google-calendars'), 'small', 'submit-revoke', false); ?>
 </form>
 
-<h2><?php _e('Remove plugin data'); ?></h2>
-<p><?php printf(_('Removes all saved plugin data.<br>If you have authorized this plugin access to your calendars, manually revoke access on the Google <a href="%s" target="__blank">Permissions</a> page.'), 'https://myaccount.google.com/permissions'); ?></p>
+<h2><?php _e('Remove plugin data', 'private-google-calendars'); ?></h2>
+<p><?php printf(_('Removes all saved plugin data.<br>If you have authorized this plugin access to your calendars, manually revoke access on the Google <a href="%s" target="__blank">Permissions</a> page.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'); ?></p>
 <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_remove">
-  <?php submit_button(__('Remove plugin data'), 'small', 'submit-remove', false); ?>
+  <?php submit_button(__('Remove plugin data', 'private-google-calendars'), 'small', 'submit-remove', false); ?>
 </form>
     
   <?php } ?>
@@ -874,9 +871,9 @@ function pgc_delete_plugin_data($which = 'all') {
  * Helper function die die with different kind of errors.
  */
 function pgc_die($error = null) {
-  $backLink = '<br><br><a href="' . admin_url('options-general.php?page=pgc') . '">Back</a>';
+  $backLink = '<br><br><a href="' . admin_url('options-general.php?page=pgc') . '">' . __('Back', 'private-google-calendars') . '</a>';
   if (empty($error)) {
-    wp_die(__('Unknown error') . $backLink);
+    wp_die(__('Unknown error', 'private-google-calendars') . $backLink);
   }
   if ($error instanceof Exception) {
     $s = [];
@@ -895,7 +892,7 @@ function pgc_die($error = null) {
   } elseif (is_string($error)) {
     wp_die($error . $backLink);
   } else {
-    wp_die(__('Unknown error format') . $backLink);
+    wp_die(__('Unknown error format', 'private-google-calendars') . $backLink);
   }
 }
 
@@ -949,7 +946,7 @@ function pgc_settings_init() {
       'pgc_settings_section_always',
       'General settings',
       function() {
-        ?>Settings for both private and public calendars.<?php
+        _e('Settings for both private and public calendars.', 'private-google-calendars');
       },
       'pgc'); // page, slug
 
@@ -957,7 +954,7 @@ function pgc_settings_init() {
         'pgc_settings_section_public',
         'Public calendar settings',
         function() {
-          ?><p>Access to public calendars require an API key.</p><?php
+          _e('Access to public calendars require an API key.', 'private-google-calendars');
         }, // leeg
         'pgc'); // page, slug
 
@@ -967,7 +964,7 @@ function pgc_settings_init() {
           function() use ($clientSecret) {
             if (empty($clientSecret)) {
               ?>
-              <p class="pgc-notice"><?php printf(__('Note: Create a new project in de Google developer console <strong>and make sure you set <code>%s</code> as the authorized redirect URI!</strong>'), admin_url('options-general.php?page=pgc')); ?></p>
+              <p class="pgc-notice"><?php printf(__('Note: Create a new project in de Google developer console <strong>and make sure you set <code>%s</code> as the authorized redirect URI!</strong>', 'private-google-calendars'), admin_url('options-general.php?page=pgc')); ?></p>
               <?php
             } else {
               // empty
@@ -989,12 +986,12 @@ function pgc_settings_init() {
 
   add_settings_field(
     'pgc_api_key',
-    '<label for="pgc_api_key">API key</label>',
+    '<label for="pgc_api_key">' . __('API key', 'private-google-calendars') . '</label>',
     function() {
         $setting = get_option('pgc_api_key');
         ?>
         <input id="pgc_api_key" type="text" name="pgc_api_key" class="regular-text" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
-        <p class="description">If you only want to display public calendars, an API key is all you need.</p>
+        <p class="description"><?php _e('If you only want to display public calendars, an API key is all you need.', 'private-google-calendars'); ?></p>
         <?php
     },
     'pgc',
@@ -1003,9 +1000,9 @@ function pgc_settings_init() {
 
   add_settings_field(
     'pgc_public_calendarlist',
-    '<label for="pgc_public_calendarlist">Public calendars</label>',
+    '<label for="pgc_public_calendarlist">' . __('Public calendars', 'private-google-calendars') . '</label>',
     function() {
-        ?><table class="pgc-public-calendar-table"><tr><th>Calendar ID</th><th>Title</th><th>Color</th><th>Delete</th></tr><?php
+        ?><table class="pgc-public-calendar-table"><tr><th><?php _e('Calendar ID', 'private-google-calendars'); ?></th><th><?php _e('Title', 'private-google-calendars'); ?></th><th><?php _e('Color', 'private-google-calendars'); ?></th><th><?php _e('Delete', 'private-google-calendars'); ?></th></tr><?php
         $publicCalendars = get_option('pgc_public_calendarlist');
         // $publicCalendars can be empty string
         if (empty($publicCalendars)) {
@@ -1027,7 +1024,7 @@ function pgc_settings_init() {
           <td></td>
         </tr>
         </table>
-        <p class="description">Setup your public calendars here to display a title and background color. This is optional.</p>
+        <p class="description"><?php _e('Setup your public calendars here to display a title and background color. This is optional.', 'private-google-calendars'); ?></p>
         <?php
     },
     'pgc',
@@ -1036,12 +1033,12 @@ function pgc_settings_init() {
 
   add_settings_field(
     'pgc_settings_cache_time',
-    __('Cache time in minutes'),
+    __('Cache time in minutes', 'private-google-calendars'),
     function() {
       $cacheTime = get_option('pgc_cache_time');
       ?>
         <input type="number" name="pgc_cache_time" id="pgc_cache_time" value="<?php echo esc_attr($cacheTime); ?>" />
-        <p><em>Set to 0 to disable cache.</em></p>
+        <p><em><?php _e('Set to 0 to disable cache.', 'private-google-calendars'); ?></em></p>
       <?php
     },
     'pgc',
@@ -1067,7 +1064,7 @@ function pgc_settings_init() {
     if (empty($clientSecret) || !empty($clientSecretError)) {
       add_settings_field(
         'pgc_settings_client_secret_json',
-        __('Upload client secret'),
+        __('Upload client secret', 'private-google-calendars'),
         'pgc_settings_client_secret_json_cb',
         'pgc',
         'pgc_settings_section');
@@ -1076,7 +1073,7 @@ function pgc_settings_init() {
 
     add_settings_field(
         'pgc_settings_selected_calendar_ids_json',
-        __('Select calendars'),
+        __('Select calendars', 'private-google-calendars'),
         'pgc_settings_selected_calendar_ids_json_cb',
         'pgc',
         'pgc_settings_section');
@@ -1135,7 +1132,7 @@ function pgc_settings_selected_calendar_ids_json_cb() {
     }
   } else {
     ?>
-    <p><?php _e('No calendars yet.'); ?></p>
+    <p><?php _e('No calendars yet.', 'private-google-calendars'); ?></p>
     <?php
   }
 }
@@ -1343,8 +1340,8 @@ class Pgc_Calendar_Widget extends WP_Widget {
   public function __construct() {
     parent::__construct(
       'pgc_calender_widget', // Base ID
-      __('Private Google Calendars Widget'),
-      ['description' => __('Private Google Calendars Widget')]
+      __('Private Google Calendars Widget', 'private-google-calendars'),
+      ['description' => __('Private Google Calendars Widget', 'private-google-calendars')]
     );
   }
 
@@ -1508,9 +1505,9 @@ class Pgc_Calendar_Widget extends WP_Widget {
     </script>
 
       <p>
-      <strong class="pgc-calendar-widget-row">Private calendars</strong>
+      <strong class="pgc-calendar-widget-row"><?php _e('Private calendars', 'private-google-calendars'); ?></strong>
       <?php if (empty($calendarListByKey)) { ?>
-        <em>No private calendars</em>
+        <em><?php _e('No private calendars', 'private-google-calendars'); ?></em>
       </p>
       <?php } else { ?>
       <?php foreach($calendarListByKey as $calId => $calInfo) { ?>
@@ -1519,15 +1516,15 @@ class Pgc_Calendar_Widget extends WP_Widget {
         <?php checked(in_array($calId, $thisCalendaridsValue), true, true); ?>
         name="<?php echo $this->get_field_name('thiscalendarids'); ?>[]"
         value="<?php echo $calId; ?>" />
-        <?php _e($calInfo['summary']); ?></label>
+        <?php echo $calInfo['summary']; ?></label>
       <?php } ?>
       </p>
-      <p><em>Note: no selection means all calendars.</em></p>
+      <p><em><?php _e('Note: no selection means all calendars.', 'private-google-calendars'); ?></em></p>
       <?php } ?>
 
 
       <p>
-      <strong class="pgc-calendar-widget-row">Public calendar</strong>
+      <strong class="pgc-calendar-widget-row"><?php _e('Public calendar', 'private-google-calendars'); ?></strong>
       <label class="pgc-calendar-widget-row" for="<?php echo $publicCheckboxId; ?>"><input type="checkbox"
           <?php checked($publicValue, true, true); ?>
           id="<?php echo $publicCheckboxId; ?>"
@@ -1535,14 +1532,14 @@ class Pgc_Calendar_Widget extends WP_Widget {
           onclick="window.onPublicCheckboxClick(this);"
           value="true" />
         <?php _e('Show public calendar'); ?></label>
-        <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $publicCheckboxId; ?>">Enter comma separated list of calendar ID's:<br>
+        <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $publicCheckboxId; ?>"><?php _e('Enter comma separated list of calendar ID\'s:', 'private-google-calendars'); ?><br>
         <textarea class="widefat pgc-calendar-codearea pgc-calendar-widget-row" name="<?php echo $this->get_field_name('publiccalendarids'); ?>"
           id="<?php echo $publicCalendarIdsAreaId; ?>"
         ><?php echo esc_html($publicCalendarids); ?></textarea></label>
       </p>
 
       <p>
-      <strong class="pgc-calendar-widget-row">Calendar options</strong>
+      <strong class="pgc-calendar-widget-row"><?php _e('Calendar options', 'private-google-calendars'); ?></strong>
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('filter'); ?>"><input type="checkbox"
           <?php checked($filterValue, true, true); ?>
           id="<?php echo $this->get_field_id('filter'); ?>"
@@ -1558,9 +1555,9 @@ class Pgc_Calendar_Widget extends WP_Widget {
           onclick="window.onHidefuturePassedCheckboxClick(this);"
           value="true" />
         <?php _e('Hide passed events...'); ?></label>
-        <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $hidepassedCheckboxId; ?>">...more than <input min="0" class="pgc_small_numeric_input" type="number" name="<?php echo $this->get_field_name('hidepasseddays'); ?>"
+        <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $hidepassedCheckboxId; ?>"><?php _e('...more than', 'private-google-calendars'); ?> <input min="0" class="pgc_small_numeric_input" type="number" name="<?php echo $this->get_field_name('hidepasseddays'); ?>"
           id="<?php echo $this->get_field_id('hidepasseddays'); ?>"
-          value="<?php echo $hidepasseddaysValue; ?>" /> days ago</label>
+          value="<?php echo $hidepasseddaysValue; ?>" /> <?php _e('days ago', 'private-google-calendars'); ?></label>
       <label class="pgc-calendar-widget-row" for="<?php echo $hidefutureCheckboxId; ?>"><input type="checkbox"
           <?php checked($hidefutureValue, true, true); ?>
           id="<?php echo $hidefutureCheckboxId; ?>"
@@ -1568,68 +1565,68 @@ class Pgc_Calendar_Widget extends WP_Widget {
           onclick="window.onHidefuturePassedCheckboxClick(this);"
           value="true" />
         <?php _e('Hide future events...'); ?></label>
-        <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $hidefutureCheckboxId; ?>">...more than <input min="0" class="pgc_small_numeric_input" type="number" name="<?php echo $this->get_field_name('hidefuturedays'); ?>"
+        <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $hidefutureCheckboxId; ?>"><?php _e('...more than', 'private-google-calendars'); ?> <input min="0" class="pgc_small_numeric_input" type="number" name="<?php echo $this->get_field_name('hidefuturedays'); ?>"
           id="<?php echo $this->get_field_id('hidefuturedays'); ?>"
-          value="<?php echo $hidefuturedaysValue; ?>" /> from now</label>
+          value="<?php echo $hidefuturedaysValue; ?>" /> <?php _e('from now', 'private-google-calendars'); ?></label>
       </p>
 
       <p>
-      <strong class="pgc-calendar-widget-row">Event popup options</strong>
+      <strong class="pgc-calendar-widget-row"><?php _e('Event popup options', 'private-google-calendars'); ?></strong>
       <label class="pgc-calendar-widget-row" for="<?php echo $popupCheckboxId; ?>"><input type="checkbox"
           <?php checked($eventpopupValue, true, true); ?>
           id="<?php echo $popupCheckboxId; ?>"
           name="<?php echo $this->get_field_name('eventpopup'); ?>"
           value="true" onclick="window.onPgcPopupCheckboxClick(this);" />
-        <?php _e('Show event popup'); ?></label>
+        <?php _e('Show event popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventlink'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventlinkValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventlink'); ?>"
           name="<?php echo $this->get_field_name('eventlink'); ?>"
           value="true" />
-        <?php _e('Show link to event in popup'); ?></label>
+        <?php _e('Show link to event in popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventdescription'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventdescriptionValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventdescription'); ?>"
           name="<?php echo $this->get_field_name('eventdescription'); ?>"
           value="true" />
-        <?php _e('Show description in popup'); ?></label>
+        <?php _e('Show description in popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventlocation'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventlocationValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventlocation'); ?>"
           name="<?php echo $this->get_field_name('eventlocation'); ?>"
           value="true" />
-        <?php _e('Show location in popup'); ?></label>
+        <?php _e('Show location in popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventattachments'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventattachmentsValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventattachments'); ?>"
           name="<?php echo $this->get_field_name('eventattachments'); ?>"
           value="true" />
-        <?php _e('Show attachments in popup'); ?></label>
+        <?php _e('Show attachments in popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventattendees'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventattendeesValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventattendees'); ?>"
           name="<?php echo $this->get_field_name('eventattendees'); ?>"
           value="true" />
-        <?php _e('Show attendees in popup'); ?></label>
+        <?php _e('Show attendees in popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventcalendarname'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventcalendarnameValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventcalendarname'); ?>"
           name="<?php echo $this->get_field_name('eventcalendarname'); ?>"
           value="true" />
-        <?php _e('Show calendar name in popup'); ?></label>
+        <?php _e('Show calendar name in popup', 'private-google-calendars'); ?></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('eventcreator'); ?>"><input data-linked-id="<?php echo $popupCheckboxId; ?>" type="checkbox"
           <?php checked($eventcreatorValue, true, true); ?>
           id="<?php echo $this->get_field_id('eventcreator'); ?>"
           name="<?php echo $this->get_field_name('eventcreator'); ?>"
           value="true" />
-        <?php _e('Show creator in popup'); ?></label>
+        <?php _e('Show creator in popup', 'private-google-calendars'); ?></label>
       </p>
     
     <?php
@@ -1653,7 +1650,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
           placeholder='<?php echo esc_attr(getPrettyJSONString($jsonExample)); ?>'
       ><?php echo esc_html($jsonValueTextarea); ?></textarea>
     </p>
-    <p><?php printf(__('See for config options the <a target="__blank" href="%s">FullCalendar docs</a>.'), 'https://fullcalendar.io/docs/'); ?></p>
+    <p><?php printf(__('See for config options the <a target="__blank" href="%s">FullCalendar docs</a>.', 'private-google-calendars'), 'https://fullcalendar.io/docs/'); ?></p>
     <script>
       (function($) {
 
@@ -1683,13 +1680,13 @@ class Pgc_Calendar_Widget extends WP_Widget {
           if (!checkAreaJSON()) {
             e.stopPropagation();
             e.preventDefault();
-            alert("<?php _e("Invalid JSON. Solve it before saving."); ?>");
+            alert("<?php _e("Invalid JSON. Solve it before saving.", 'private-google-calendars'); ?>");
             return false;
           }
           if (publicCheckbox.checked && !publicCalendarIdsArea.value) {
             e.stopPropagation();
             e.preventDefault();
-            alert("<?php _e("Enter at least 1 public calendar ID if you select the option public calendar(s)."); ?>");
+            alert("<?php _e("Enter at least 1 public calendar ID if you select the option public calendar(s).", 'private-google-calendars'); ?>");
             return false;
           }
         });

@@ -212,7 +212,7 @@
 
           texts.push('<div class="pgc-popup-row pgc-event-time"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-clock"></span></div><div class="pgc-popup-row-value">' + info.event.start.toLocaleDateString() + '<br>');
           if (info.event.allDay) {
-            texts.push("All day</div></div>");
+            texts.push(pgc_object.trans.all_day + "</div></div>");
           } else {
             if (config.timeZone) {
               // info.event.end can be null, for example when someone uses the same start and end time!
@@ -254,12 +254,12 @@
               }
             }
             if (hasCreator) {
-              texts.push('Created by: ' + (info.event.extendedProps.creator.displayName || info.event.extendedProps.creator.email));
+              texts.push(pgc_object.trans.created_by + ': ' + (info.event.extendedProps.creator.displayName || info.event.extendedProps.creator.email));
             }
             texts.push('</div></div>');
           }
           if (showEventLink) {
-            texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a target="__blank" href="' + info.event.extendedProps.htmlLink + '">Go to event</a></div></div>');
+            texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a target="__blank" href="' + info.event.extendedProps.htmlLink + '">' + pgc_object.trans.go_to_event + '</a></div></div>');
           }
           info.el.setAttribute("data-tippy-content",  texts.join("\n"));
         }
