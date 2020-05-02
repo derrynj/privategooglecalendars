@@ -3,37 +3,20 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200501
+Version: 20200502
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
 Text Domain: private-google-calendars
+Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200501');
+define('PGC_PLUGIN_VERSION', '20200502');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
 }
-
-define('PGC_PLUGIN_NAME', __('Private Google Calendars'));
-
-define('PGC_NOTICES_VERIFY_SUCCESS', __('Verify OK!', 'private-google-calendars'));
-define('PGC_NOTICES_REVOKE_SUCCESS', __('Access revoked. This plugin does not have access to your calendars anymore.', 'private-google-calendars'));
-define('PGC_NOTICES_REMOVE_SUCCESS', sprintf(__('Plugin data removed. Make sure to also manually revoke access to your calendars in the Google <a target="__blank" href="%s">Permissions</a> page!', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
-define('PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS', __('Calendars updated.', 'private-google-calendars'));
-define('PGC_NOTICES_CACHE_DELETED', __('Cache deleted.', 'private-google-calendars'));
-
-define('PGC_ERRORS_CLIENT_SECRET_MISSING', __('No client secret.', 'private-google-calendars'));
-define('PGC_ERRORS_CLIENT_SECRET_INVALID', __('Invalid client secret.', 'private-google-calendars'));
-define('PGC_ERRORS_ACCESS_TOKEN_MISSING', __('No access token.', 'private-google-calendars'));
-define('PGC_ERRORS_REFRESH_TOKEN_MISSING', sprintf(__('Your refresh token is missing!<br><br>This can only be solved by manually revoking this plugin&#39;s access in the Google <a target="__blank" href="%s">Permissions</a> page and remove all plugin data.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
-define('PGC_ERRORS_ACCESS_REFRESH_TOKEN_MISSING', __('No access and refresh tokens.', 'private-google-calendars'));
-define('PGC_ERRORS_REDIRECT_URI_MISSING', __('URI <code>%s</code> missing in the client secret file. Adjust your Google project and upload the new client secret file.', 'private-google-calendars'));
-define('PGC_ERRORS_INVALID_FORMAT', __('Invalid format', 'private-google-calendars'));
-define('PGC_ERRORS_NO_CALENDARS', __('No calendars', 'private-google-calendars'));
-define('PGC_ERRORS_NO_SELECTED_CALENDARS',  __('No selected calendars', 'private-google-calendars'));
 
 define('PGC_TRANSIENT_PREFIX', 'pgc_ev_');
 define('PGC_EVENTS_MAX_RESULTS', 100);
@@ -43,15 +26,41 @@ define('PGC_EVENTS_MAX_RESULTS', 100);
 // If someone wants to override this or add their own styles, they have to enqueue their style with a higher priority.
 define('PGC_ENQUEUE_ACTION_PRIORITY', 11);
 
+function initTranslatedDefines() {
+  define('PGC_PLUGIN_NAME', __('Private Google Calendars'));
+
+  define('PGC_NOTICES_VERIFY_SUCCESS', __('Verify OK!', 'private-google-calendars'));
+  define('PGC_NOTICES_REVOKE_SUCCESS', __('Access revoked. This plugin does not have access to your calendars anymore.', 'private-google-calendars'));
+  define('PGC_NOTICES_REMOVE_SUCCESS', sprintf(__('Plugin data removed. Make sure to also manually revoke access to your calendars in the Google <a target="__blank" href="%s">Permissions</a> page!', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
+  define('PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS', __('Calendars updated.', 'private-google-calendars'));
+  define('PGC_NOTICES_CACHE_DELETED', __('Cache deleted.', 'private-google-calendars'));
+
+  define('PGC_ERRORS_CLIENT_SECRET_MISSING', __('No client secret.', 'private-google-calendars'));
+  define('PGC_ERRORS_CLIENT_SECRET_INVALID', __('Invalid client secret.', 'private-google-calendars'));
+  define('PGC_ERRORS_ACCESS_TOKEN_MISSING', __('No access token.', 'private-google-calendars'));
+  define('PGC_ERRORS_REFRESH_TOKEN_MISSING', sprintf(__('Your refresh token is missing!<br><br>This can only be solved by manually revoking this plugin&#39;s access in the Google <a target="__blank" href="%s">Permissions</a> page and remove all plugin data.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
+  define('PGC_ERRORS_ACCESS_REFRESH_TOKEN_MISSING', __('No access and refresh tokens.', 'private-google-calendars'));
+  define('PGC_ERRORS_REDIRECT_URI_MISSING', __('URI <code>%s</code> missing in the client secret file. Adjust your Google project and upload the new client secret file.', 'private-google-calendars'));
+  define('PGC_ERRORS_INVALID_FORMAT', __('Invalid format', 'private-google-calendars'));
+  define('PGC_ERRORS_NO_CALENDARS', __('No calendars', 'private-google-calendars'));
+  define('PGC_ERRORS_NO_SELECTED_CALENDARS',  __('No selected calendars', 'private-google-calendars'));
+}
+
 /**
  * Add shortcode.
  */
-add_action('init', 'pgc_shortcodes_init');
-function pgc_shortcodes_init() {
+add_action('init', 'pgc_init');
+function pgc_init() {
+
+  load_plugin_textdomain('private-google-calendars', FALSE, basename(dirname(__FILE__)) . '/languages/');
+
+  initTranslatedDefines();
+
   add_shortcode('pgc', 'pgc_shortcode');
   if (function_exists('register_block_type')) {
     pgc_register_block();
   }
+
 }
 
 if (is_admin()) {
@@ -106,7 +115,43 @@ function pgc_register_block() {
       $selectedCalendars[$calendar['id']] = $calendar;
     }
   }
+
+  $blockTrans = [
+    'calendar_options' => __('Calendar options', 'private-google-calendars'),
+    'selected_calendars' => __('Selected calendars', 'private-google-calendars'),
+    'all' => __('All', 'private-google-calendars'),
+    'public' => __('Public', 'private-google-calendars'),
+    'public_calendars' => __('Public calendar(s)', 'private-google-calendars'),
+    'show_calendar_filter' => __('Show calendar filter', 'private-google-calendars'),
+    'edit_fullcalendar_config' => __('Edit FullCalendar config', 'private-google-calendars'),
+    'hide_passed_events' => __('Hide passed events...', 'private-google-calendars'),
+    'hide_future_events' => __('Hide future events...', 'private-google-calendars'),
+    'popup_options' => __('Popup options', 'private-google-calendars'),
+    'show' => __('Show', 'private-google-calendars'),
+    'hide' => __('Hide', 'private-google-calendars'),
+    'copy_fullcalendar_config_info' => __('Copy the default FullCalendar config if you want to change it. This is the configuration object that you can set as the second argument in the <code>FullCalendar.Calendar</code> constructor.', 'private-google-calendars'),
+    'fullcalendar_docs_link' => __('See the <a target="_blank" href="https://fullcalendar.io/docs#toc">FullCalendar documentation</a> for available configuration options.', 'private-google-calendars'),
+    'eventpopup' => __('Show event popup', 'private-google-calendars'),
+    'eventlink' => __('Show event link', 'private-google-calendars'),
+    'eventdescription' => __('Show event description', 'private-google-calendars'),
+    'eventlocation' => __('Show event location', 'private-google-calendars'),
+    'eventattendees' => __('Show event attendees', 'private-google-calendars'),
+    'eventattachments' => __('Show event attachments', 'private-google-calendars'),
+    'eventcreator' => __('Show event creator', 'private-google-calendars'),
+    'eventcalendarname' => __('Show calendarname', 'private-google-calendars'),
+    'more_than' => __('...more than', 'private-google-calendars'),
+    'days_ago' => __('days ago', 'private-google-calendars'),
+    'days_from_now' => __('days from now', 'private-google-calendars'),
+    'malformed_json' => __('Malformed JSON, this calendar will probably not display correctly', 'private-google-calendars'),
+    'enter_one_or_more_public_calendar_ids' => __('Enter 1 or more public calendar IDs', 'private-google-calendars'),
+    'malformed_json_short' => __('Malformed JSON', 'private-google-calendars'),
+    'fullcalendar_config' => __('FullCalendar config', 'private-google-calendars'),
+    'copy_default_fullcalendar_config' => __('Copy default FullCalendar config', 'private-google-calendars'),
+    'comma_separated_list_calendar_ids' => __('Comma separated list of public calendar IDs', 'private-google-calendars')
+  ];
+
   wp_add_inline_script('pgc-plugin-script', 'window.pgc_selected_calendars=' . json_encode($selectedCalendars) . ';', 'before');
+  wp_add_inline_script('pgc-plugin-script', 'window.pgc_trans = ' . json_encode($blockTrans) . ';', 'before');
 
 }
 
@@ -652,7 +697,7 @@ function pgc_show_tools() {
   <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_deletecache">
   <?php
-  submit_button(__('Remove cache'), 'small', 'submit-deletecache', false, $cacheArgs);
+  submit_button(__('Remove cache', 'private-google-calendars'), 'small', 'submit-deletecache', false, $cacheArgs);
   if (empty($cachedEvents)) { ?>
     <em><?php _e('Cache is empty.', 'private-google-calendars'); ?></em>
   <?php } ?>
@@ -667,7 +712,7 @@ function pgc_show_tools() {
 </form>
 
 <h2><?php _e('Remove plugin data', 'private-google-calendars'); ?></h2>
-<p><?php printf(_('Removes all saved plugin data.<br>If you have authorized this plugin access to your calendars, manually revoke access on the Google <a href="%s" target="__blank">Permissions</a> page.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'); ?></p>
+<p><?php printf(__('Removes all saved plugin data.<br>If you have authorized this plugin access to your calendars, manually revoke access on the Google <a href="%s" target="__blank">Permissions</a> page.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'); ?></p>
 <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_remove">
   <?php submit_button(__('Remove plugin data', 'private-google-calendars'), 'small', 'submit-remove', false); ?>
@@ -944,7 +989,7 @@ function pgc_settings_init() {
 
     add_settings_section(
       'pgc_settings_section_always',
-      'General settings',
+      __('General settings', 'private-google-calendars'),
       function() {
         _e('Settings for both private and public calendars.', 'private-google-calendars');
       },
@@ -952,7 +997,7 @@ function pgc_settings_init() {
 
       add_settings_section(
         'pgc_settings_section_public',
-        'Public calendar settings',
+        __('Public calendar settings', 'private-google-calendars'),
         function() {
           _e('Access to public calendars require an API key.', 'private-google-calendars');
         }, // leeg
@@ -960,7 +1005,7 @@ function pgc_settings_init() {
 
       add_settings_section(
           'pgc_settings_section',
-          'Private calendar settings',
+          __('Private calendar settings', 'private-google-calendars'),
           function() use ($clientSecret) {
             if (empty($clientSecret)) {
               ?>

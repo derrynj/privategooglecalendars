@@ -32,8 +32,8 @@ const MyInfoModal = function(props) {
         <Modal
             title="FullCalendar config"
             onRequestClose={ props.onClose }>
-            <p>Copy the default FullCalendar config if you want to change it. This is the configuration object that you can set as the second argument in the <code>FullCalendar.Calendar</code> constructor.</p>
-            <p>See the <a target="_blank" href="https://fullcalendar.io/docs#toc">FullCalendar documentation</a> for available configuration options.</p>
+            <p dangerouslySetInnerHTML={{ __html: window.pgc_trans.copy_fullcalendar_config_info }} />
+            <p dangerouslySetInnerHTML={{ __html: fullcalendar_docs_link }} />
 
         </Modal>
     );
@@ -152,14 +152,14 @@ registerBlockType('pgc-plugin/calendar', {
         }
 
         const eventPopupList = [
-            ["eventpopup", "Show event popup"],
-            ["eventlink", "Show event link"],
-            ["eventdescription", "Show event description"],
-            ["eventlocation", "Show event location"],
-            ["eventattendees", "Show event attendees"],
-            ["eventattachments", "Show event attachments"],
-            ["eventcreator", "Show event creator"],
-            ["eventcalendarname", "Show calendarname"],
+            ["eventpopup", window.pgc_trans.eventpopup],
+            ["eventlink", window.pgc_trans.eventlink],
+            ["eventdescription", window.pgc_trans.eventdescription],
+            ["eventlocation", window.pgc_trans.eventlocation],
+            ["eventattendees", window.pgc_trans.eventattendees],
+            ["eventattachments", window.pgc_trans.eventattachments],
+            ["eventcreator", window.pgc_trans.eventcreator],
+            ["eventcalendarname", window.pgc_trans.eventcalendarname],
         ].map((item) => {
             return <CheckboxControl className="pgc-sidebar-row" onChange={onCalendarConfigChange.bind(item[0])}
                 label={item[1]} checked={config[item[0]]} />;
@@ -167,12 +167,12 @@ registerBlockType('pgc-plugin/calendar', {
 
         const hidePassedDays = hideoptions.hidepassed
             ? 
-            <TextControl label={`...more than ${hideoptions.hidepasseddays} days ago`} type="number" min={0}
+            <TextControl label={`${window.pgc_trans.more_than} ${hideoptions.hidepasseddays} ${window.pgc_trans.days_ago}`} type="number" min={0}
                 value={hideoptions.hidepasseddays} onChange={onHideoptionsChange.bind('hidepasseddays')} />
             : null;
         const hideFutureDays = hideoptions.hidefuture
             ?
-            <TextControl label={`...more than ${hideoptions.hidefuturedays} days from now`} type="number" min={0}
+            <TextControl label={`${window.pgc_trans.more_than} ${hideoptions.hidefuturedays} ${window.pgc_trans.days_from_now}`} type="number" min={0}
                 value={hideoptions.hidefuturedays} onChange={onHideoptionsChange.bind('hidefuturedays')} />
             : null;
 
@@ -186,14 +186,14 @@ registerBlockType('pgc-plugin/calendar', {
                             // Infinite loop when directly called, don't know why.
                             let t = setTimeout(function() {
                                 clearTimeout(t);
-                                wp.data.dispatch("core/notices").createWarningNotice("Malformed JSON, this calendar will probably not display correctly");
+                                wp.data.dispatch("core/notices").createWarningNotice(window.pgc_trans.malformed_json);
                             }, 0);
                             unsubscribe();
                         }
                         if (isPublic && !publiccalendarids) {
                             let t = setTimeout(function() {
                                 clearTimeout(t);
-                                wp.data.dispatch("core/notices").createWarningNotice("Enter 1 or more public calendar IDs");
+                                wp.data.dispatch("core/notices").createWarningNotice(window.pgc_trans.enter_one_or_more_public_calendar_ids);
                             }, 0);
                             unsubscribe();
                         }
@@ -208,11 +208,11 @@ registerBlockType('pgc-plugin/calendar', {
                 <TextareaControl rows={10} onKeyDown={onAreaKeyDown}
                     className={"pgc-fullcalendarconfigarea " + (hasValidFullCalendarConfigValue ? "" : "has-error")}
                     value={fullcalendarconfig}
-                    help={!hasValidFullCalendarConfigValue ? "Malformed JSON" : ""}
-                    label="FullCalendar config"
+                    help={!hasValidFullCalendarConfigValue ? window.pgc_trans.malformed_json_short : ""}
+                    label={window.pgc_trans.fullcalendar_config}
                     placeHolder={defaultFullcalendarConfig} onChange={onFullCalendarConfigChange} />
                 <div className="pgc-copy-link">
-                    <a href="#" onClick={(e) => {e.preventDefault(); onFullCalendarConfigChange(defaultFullcalendarConfig)}}>Copy default FullCalendar config</a>
+        <a href="#" onClick={(e) => {e.preventDefault(); onFullCalendarConfigChange(defaultFullcalendarConfig)}}>{window.pgc_trans.copy_default_fullcalendar_config}</a>
                     <span onClick={() => setShowInfoModal(true)} class="dashicons dashicons-editor-help"></span>
                 </div>
             </Fragment>
@@ -220,7 +220,7 @@ registerBlockType('pgc-plugin/calendar', {
 
         const publicCalendarIdsInput = isPublic ? (
             <Fragment>
-                <TextControl label="Comma separated list of public calendar IDs" value={publiccalendarids} onChange={onPublicCalendarIdsChange} />
+                <TextControl label={window.pgc_trans.comma_separated_list_calendar_ids} value={publiccalendarids} onChange={onPublicCalendarIdsChange} />
             </Fragment>
         ) : null
 
@@ -230,28 +230,28 @@ registerBlockType('pgc-plugin/calendar', {
             <Fragment>
                 <InspectorControls>
                     <PanelBody
-                        title={"Selected calendars (" + (isPublic ? "Public" : (selectedCalendarCount === 0 ? "All" : selectedCalendarCount)) + ")"}
+                        title={window.pgc_trans.selected_calendars + " (" + (isPublic ? window.pgc_trans.public : (selectedCalendarCount === 0 ? window.pgc_trans.all : selectedCalendarCount)) + ")"}
                         initialOpen={true}>
                         {calendarList}
                         <CheckboxControl className="pgc-sidebar-row" onChange={onPublicChange}
-                            label="Public calendar(s)" checked={isPublic} />
+                            label={window.pgc_trans.public_calendars} checked={isPublic} />
                     </PanelBody>
                     <PanelBody
-                        title="Calendar options"
+                        title={window.pgc_trans.calendar_options}
                         initialOpen={true}>
                         <CheckboxControl className="pgc-sidebar-row" onChange={onCalendarConfigChange.bind('filter')}
-                            label="Show calendar filter" checked={config.filter} />
+                            label={window.pgc_trans.show_calendar_filter} checked={config.filter} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={setShowConfigArea}
-                            label="Edit FullCalendar config" checked={showConfigArea} />
+                            label={window.pgc_trans.edit_fullcalendar_config} checked={showConfigArea} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={onHideoptionsChange.bind('hidepassed')}
-                            label="Hide passed events..." checked={hideoptions.hidepassed} />
+                            label={window.pgc_trans.hide_passed_events} checked={hideoptions.hidepassed} />
                         {hidePassedDays}
                         <CheckboxControl className="pgc-sidebar-row" onChange={onHideoptionsChange.bind('hidefuture')}
-                            label="Hide future events..." checked={hideoptions.hidefuture} />
+                            label={window.pgc_trans.hide_future_events} checked={hideoptions.hidefuture} />
                         {hideFutureDays}
                     </PanelBody>
                     <PanelBody
-                        title={"Popup options (" + (config.eventpopup ? "Show" : "Hide") + ")"}
+                        title={window.pgc_trans.popup_options + " (" + (config.eventpopup ? window.pgc_trans.show : window.pgc_trans.hide) + ")"}
                         initialOpen={true}>
                         {eventPopupList}
                     </PanelBody>

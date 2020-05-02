@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.4
+Tested up to: 5.4.1
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -61,6 +61,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/mai
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
 
 == Changelog ==
+
+= 20200502 =
+* Added translation files.
 
 = 20200501 =
 * Prepare for translation.
