@@ -133,6 +133,7 @@ tr[data-tippy-content] {
   height:1rem;
   padding:0 .2rem;
   opacity:.4;
+  border-radius:.4rem;
 }
 
 .pgc-calendar-filter input[type=checkbox]:checked + label span {
