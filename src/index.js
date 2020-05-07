@@ -33,7 +33,7 @@ const MyInfoModal = function(props) {
             title="FullCalendar config"
             onRequestClose={ props.onClose }>
             <p dangerouslySetInnerHTML={{ __html: window.pgc_trans.copy_fullcalendar_config_info }} />
-            <p dangerouslySetInnerHTML={{ __html: fullcalendar_docs_link }} />
+            <p dangerouslySetInnerHTML={{ __html: window.pgc_trans.fullcalendar_docs_link }} />
 
         </Modal>
     );
