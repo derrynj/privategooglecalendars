@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200508 =
+* Fixed modal FullCalendar popup
+
 = 20200502 =
 * Added translation files.
 
