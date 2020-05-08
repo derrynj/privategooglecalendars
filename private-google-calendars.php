@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200508
+Version: 20200509
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200508');
+define('PGC_PLUGIN_VERSION', '20200509');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -366,14 +366,14 @@ function pgc_enqueue_scripts() {
 
 /**
  * Validates date that should be in MySQL format (Y-m-d) optionally with T00:00:00 appended.
- * @return valid $date with T00:00:00 time format appended or false
+ * @return valid $date with T00:00:00Z time format appended or false
  */
-function pgc_validate_date($date) {
+function pgc_validate_date($date, $addTime = 'T00:00:00Z') {
   if (preg_match("/^\d{4}\-\d{2}\-\d{2}$/", $date)) {
-    return $date . 'T00:00:00';
+    return $date . $addTime;
   }
   if (preg_match("/^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}$/", $date)) {
-    return $date;
+    return $date . 'Z';
   }
   return false;
 }
@@ -508,10 +508,13 @@ function pgc_ajax_get_calendar() {
           $newItem['allDay'] = true;
           $newItem['start'] = $item['start']['date'];
           $newItem['end'] = $item['end']['date'];
+          // $newItem['timeZone'] = $item['start']['timeZone']; // TODO? end timezone also exists...
         } else {
           $newItem['start'] = $item['start']['dateTime'];
           $newItem['end'] = $item['end']['dateTime'];
+          // $newItem['timeZone'] = $item['start']['timeZone']; // TODO? end timezone also exists...
         }
+
         $items[] = $newItem; 
       }
     }

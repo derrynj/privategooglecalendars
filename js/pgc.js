@@ -207,6 +207,8 @@
       //},
       eventRender: function(info) {
 
+        // See for possible bug(?) in FullCalendar where not all events are displayed/requested when starting out in dayList view...
+        // https://stackoverflow.com/questions/11561046/some-events-are-missing-in-week-view-and-others-in-day-view-but-are-shown-in-mon
         if (showEventPopup) {
           var texts = ['<span class="pgc-popup-draghandle dashicons dashicons-screenoptions"></span><div class="pgc-popup-row pgc-event-title"><div class="pgc-popup-row-icon"><span></span></div><div class="pgc-popup-row-value">' + info.event.title + '</div></div>'];
 
@@ -215,6 +217,7 @@
             texts.push(pgc_object.trans.all_day + "</div></div>");
           } else {
             if (config.timeZone) {
+              // TODO: this is not always converted to correct date.
               // info.event.end can be null, for example when someone uses the same start and end time!
               texts.push(moment.tz(info.event.start, config.timeZone).format("LT")
                 + " - "
