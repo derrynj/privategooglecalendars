@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200510
+Version: 20200511
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200510');
+define('PGC_PLUGIN_VERSION', '20200511');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -364,19 +364,19 @@ function pgc_enqueue_scripts() {
   
 }
 
-/**
- * Validates date that should be in MySQL format (Y-m-d) optionally with T00:00:00 appended.
- * @return valid $date with T00:00:00Z time format appended or false
- */
-function pgc_validate_date($date, $addTime = 'T00:00:00Z') {
-  if (preg_match("/^\d{4}\-\d{2}\-\d{2}$/", $date)) {
-    return $date . $addTime;
-  }
-  if (preg_match("/^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}$/", $date)) {
-    return $date . 'Z';
-  }
-  return false;
-}
+// /**
+//  * Validates date that should be in MySQL format (Y-m-d) optionally with T00:00:00 appended.
+//  * @return valid $date with T00:00:00Z time format appended or false
+//  */
+// function pgc_validate_date($date, $addTime = 'T00:00:00Z') {
+//   if (preg_match("/^\d{4}\-\d{2}\-\d{2}$/", $date)) {
+//     return $date . $addTime;
+//   }
+//   if (preg_match("/^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}$/", $date)) {
+//     return $date . 'Z';
+//   }
+//   return false;
+// }
 
 /**
  * Handle AJAX request from frontend.
@@ -393,14 +393,17 @@ function pgc_ajax_get_calendar() {
       throw new Exception(PGC_ERRORS_INVALID_FORMAT);
     }
 
-    $start = pgc_validate_date($_POST['start']);
-    if (!$start) {
-      throw new Exception(PGC_ERRORS_INVALID_FORMAT);
-    }
-    $end = pgc_validate_date($_POST['end']);
-    if (!$end) {
-      throw new Exception(PGC_ERRORS_INVALID_FORMAT);
-    }
+    // $start = pgc_validate_date($_POST['start']);
+    // if (!$start) {
+    //   throw new Exception(PGC_ERRORS_INVALID_FORMAT);
+    // }
+    // $end = pgc_validate_date($_POST['end']);
+    // if (!$end) {
+    //   throw new Exception(PGC_ERRORS_INVALID_FORMAT);
+    // }
+    // Start and end are in ISO8601 string format with timezone offset (e.g. 2018-09-01T12:30:00-05:00)
+    $start = $_POST['start'];
+    $end = $_POST['end'];
 
     $thisCalendarids = null;
 
@@ -466,6 +469,9 @@ function pgc_ajax_get_calendar() {
       'timeMin' => $start,
       'timeMax' => $end,
     );
+    if (!empty($_POST['timeZone'])) {
+      $optParams['timeZone'] = $_POST['timeZone'];
+    }
 
     if (!empty($_POST['isPublic'])) {
       // Call public calendars with API key

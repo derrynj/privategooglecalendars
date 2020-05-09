@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200511 =
+* Added timezone and ISO datetime string to Google call
+
 = 20200510 =
 * Removed "Z" from start and end (double)
 

@@ -177,7 +177,7 @@
       });
     }
 
-    $calendarFilter.addEventListener("change", function() {
+    $calendarFilter.addEventListener("change", function(e) {
       selectedCalIds = Array.prototype.map.call(calendarWrapper.querySelectorAll(".pgc-calendar-filter-wrapper input[type='checkbox']:checked"), function(item) {
         return item.value;
       });
@@ -268,11 +268,12 @@
         }
       },
       events: function(arg, successCcallback, failureCallback) {
-
         var start = arg.start;
         var end = arg.end;
-        var fStart = dateFormat(start);
-        var fEnd = dateFormat(end);
+        //var fStart = dateFormat(start);
+        var fStart = arg.startStr;
+        //var fEnd = dateFormat(end);
+        var fEnd = arg.endStr;
 
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
@@ -280,6 +281,9 @@
         formData.append("action", "pgc_ajax_get_calendar");
         formData.append("start", fStart);
         formData.append("end", fEnd);
+        if ("timeZone" in arg && arg.timeZone) {
+          formData.append("timeZone", arg.timeZone);
+        }
         formData.append("thisCalendarids", thisCalendarids.join(","));
         if (isPublic) {
           formData.append("isPublic", 1);
