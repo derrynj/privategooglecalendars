@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200510 =
+* Removed "Z" from start and end (double)
+
 = 20200509 =
 * Added UTC "Z" to start and end time and make end time next day 23:59:59 so it gets all events.
 
