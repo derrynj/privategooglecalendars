@@ -202,22 +202,18 @@
           calendarWrapper.classList.remove("pgc-loading");
         }
       },
-      //eventClick: function(calEvent, jsEvent, view) {
-        // now handled by tippy tooltips.
-      //},
       eventRender: function(info) {
 
-        // See for possible bug(?) in FullCalendar where not all events are displayed/requested when starting out in dayList view...
-        // https://stackoverflow.com/questions/11561046/some-events-are-missing-in-week-view-and-others-in-day-view-but-are-shown-in-mon
         if (showEventPopup) {
           var texts = ['<span class="pgc-popup-draghandle dashicons dashicons-screenoptions"></span><div class="pgc-popup-row pgc-event-title"><div class="pgc-popup-row-icon"><span></span></div><div class="pgc-popup-row-value">' + info.event.title + '</div></div>'];
 
-          texts.push('<div class="pgc-popup-row pgc-event-time"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-clock"></span></div><div class="pgc-popup-row-value">' + info.event.start.toLocaleDateString() + '<br>');
+          var date = config.timeZone ? moment.tz(info.event.start, config.timeZone).format("L") : info.event.start.toLocaleDateString();
+
+          texts.push('<div class="pgc-popup-row pgc-event-time"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-clock"></span></div><div class="pgc-popup-row-value">' + date + '<br>');
           if (info.event.allDay) {
             texts.push(pgc_object.trans.all_day + "</div></div>");
           } else {
             if (config.timeZone) {
-              // TODO: this is not always converted to correct date.
               // info.event.end can be null, for example when someone uses the same start and end time!
               texts.push(moment.tz(info.event.start, config.timeZone).format("LT")
                 + " - "
@@ -385,12 +381,16 @@
     
     if (!el.classList.contains('pgc-popup-draghandle')) return;
 
-    while (el && el.className !== 'tippy-popper') {
+    while (el) {
+      if (el.getAttribute && el.hasAttribute("data-tippy-root")) {
+        popupElement = el;
+        break;
+      }
       el = el.parentNode;
     }
-    popupElement = el;
+
     if (!popupElement) return;
-    var transform = popupElement.style.transform.replace("translate3d(", "").replace(")", "").split(",");
+    var transform = popupElement.style.transform.replace("translate(", "").replace(")", "").split(",");
     popupElementStartX = parseInt(transform[0].replace(" ", ""), 10);
     popupElementStartY = parseInt(transform[1].replace(" ", ""), 10);
     startClientX = e.clientX;
@@ -400,7 +400,7 @@
   }
 
   function onBodyMouseMove(e) {
-    popupElement.style.transform = "translate3d(" + (popupElementStartX + (e.clientX - startClientX)) + "px, " + (popupElementStartY + (e.clientY - startClientY)) + "px, 0px)";
+    popupElement.style.transform = "translate(" + (popupElementStartX + (e.clientX - startClientX)) + "px, " + (popupElementStartY + (e.clientY - startClientY)) + "px)";
   }
 
   function onBodyMouseUp() {

@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200511
+Version: 20200512
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200511');
+define('PGC_PLUGIN_VERSION', '20200512');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -329,7 +329,7 @@ function pgc_enqueue_scripts() {
   wp_enqueue_script('popper',
       plugin_dir_url(__FILE__) . 'lib/popper.min.js', null, PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('tippy',
-      plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.iife.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
+      plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.umd.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('my_moment',
       plugin_dir_url(__FILE__) . 'lib/moment/moment-with-locales.min.js', null, PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('my_moment_timezone',

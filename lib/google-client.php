@@ -51,6 +51,8 @@ class PGC_GoogleClient_Request {
       $args['headers'] = $headers;
     }
 
+    $args['timeout'] = 10; // default is 5 seconds.
+
     $result = null;
     switch ($method) {
       case 'GET':

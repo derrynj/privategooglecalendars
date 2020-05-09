@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200512 =
+* Updated all libraries like tippy, popper, fullCalendar and moment.
+
 = 20200511 =
 * Added timezone and ISO datetime string to Google call
 
