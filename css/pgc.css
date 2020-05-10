@@ -125,7 +125,7 @@ tr[data-tippy-content] {
 
 .pgc-calendar-filter input[type=checkbox] {
   opacity:0;
-  position:absolute;
+  position:fixed; /* absolute makes the page scroll to top when checked */
 }
 
 .pgc-calendar-color {
