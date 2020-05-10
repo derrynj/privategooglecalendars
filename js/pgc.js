@@ -57,13 +57,20 @@
       }
     });
   }
+
   
   Array.prototype.forEach.call(document.querySelectorAll(".pgc-calendar-wrapper"), function(calendarWrapper, calendarCounter) {
+
+    var errorEl = window.document.createElement("div");
+    errorEl.className = "pgc-error-el";
+    var loadingEl = window.document.createElement("div");
+    loadingEl.className = "pgc-loading-el";
 
     var currentAllEvents = null;
     var fullCalendar = null;
     var $calendar = calendarWrapper.querySelector('.pgc-calendar');
     var $calendarFilter = calendarWrapper.querySelector('.pgc-calendar-filter');
+    var errorAndLoadingParent = null; // will be set by FullCalendar, so is not available now.
 
     var selectedCalIds = null;
     var allCalendars = null;
@@ -125,6 +132,41 @@
 
     if (isPublic && thisCalendarids.length === 0) {
       console.error("If you set the 'public' property, you have to specify at least 1 calendar ID in the 'calendarids' property.");
+    }
+
+    function makeSureErrorAndLoadingParentExists() {
+      if (!errorAndLoadingParent) {
+        errorAndLoadingParent = $calendar.querySelector(".fc-view-container");
+      }
+      return !!errorAndLoadingParent;
+    }
+
+    function clearError() {
+      if (errorEl.parentNode) {
+        errorEl.parentNode.removeChild(errorEl);
+      }
+    }
+
+    function clearLoading() {
+      if (loadingEl.parentNode) {
+        loadingEl.parentNode.removeChild(loadingEl);
+      }
+    }
+  
+    function setError(msg) {
+      clearLoading();
+      if (makeSureErrorAndLoadingParentExists()) {
+        errorEl.innerText = msg;
+        errorAndLoadingParent.appendChild(errorEl);
+      }
+    }
+  
+    function setLoading(msg) {
+      clearError();
+      if (makeSureErrorAndLoadingParentExists()) {
+        loadingEl.innerText = msg;
+        errorAndLoadingParent.appendChild(loadingEl);
+      }
     }
 
     function handleCalendarFilter(calendars) {
@@ -191,15 +233,14 @@
       loading: function(isLoading, view) {
         if (isLoading) {
           loadingTimer = setTimeout(function() {
-            calendarWrapper.classList.remove("pgc-loading-error");
-            calendarWrapper.classList.add("pgc-loading");
+            setLoading(pgc_object.trans.loading);
           }, 300);
         } else {
           if (loadingTimer) {
             clearTimeout(loadingTimer);
             loadingTimer = null;
           }
-          calendarWrapper.classList.remove("pgc-loading");
+          clearLoading();
         }
       },
       eventRender: function(info) {
@@ -288,7 +329,7 @@
           try {
             var response = JSON.parse(this.response);
             if ("error" in response) {
-              throw new Error(response);
+              throw response;
             }
             var items = [];
             if ("items" in response) {
@@ -306,12 +347,10 @@
               currentAllEvents = items;
               handleCalendarFilter(response.calendars);
             }
-            //items = getFilteredEvents();
             successCcallback([]);
             setEvents();
           } catch (ex) {
-            calendarWrapper.classList.remove("pgc-loading");
-            calendarWrapper.classList.add("pgc-loading-error");
+            setError(ex.errorDescription || ex.error || pgc_object.trans.unknown_error);
             console.error(ex);
             successCcallback([]);
           } finally {
@@ -319,8 +358,7 @@
           }
         };
         xhr.onerror = function(eError) {
-          calendarWrapper.classList.remove("pgc-loading");
-          calendarWrapper.classList.add("pgc-loading-error");
+          setError(eError.error || pgc_object.trans.request_error);
           console.error(eError);
           successCcallback([]);
         };

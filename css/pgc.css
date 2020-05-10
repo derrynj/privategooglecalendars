@@ -92,31 +92,6 @@ tr[data-tippy-content] {
 }
 
 
-/* New loading element */
-.pgc-loading .fc-view-container {
-  opacity:.8;
-}
-
-.pgc-loading .fc-view-container:after,
-.pgc-loading-error .fc-view-container:after {
-  position:absolute;
-  top:0;
-  left:0;
-  z-index:1;
-  padding:.2rem;
-}
-
-.pgc-loading .fc-view-container:after {
-  content: "Loading...";
-  background-color:#fcf8e3;
-}
-
-.pgc-loading-error .fc-view-container:after {
-  background-color:red;
-  content: "Error";
-}
-
-
 /* Start calendar filter styled checkboxes */
 .pgc-calendar-filter input[type=checkbox]:focus + label span,
 .pgc-calendar-filter input[type=checkbox]:active + label span {
@@ -189,4 +164,19 @@ tr[data-tippy-content] {
   top:5px;
   cursor: move;
   opacity: .4;
+}
+
+.pgc-loading-el, .pgc-error-el {
+  position:absolute;
+  background-color: #fcf8e3;
+  padding:1rem;
+  left:0;
+  top:0;
+  opacity:.6;
+  z-index:1;
+}
+
+.pgc-error-el {
+  background-color: red;
+  opacity: 1;
 }

@@ -62,6 +62,11 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200513 =
+* Loading and error element can be translated.
+* Better error message displayed.
+* Filter fixed position. Fixes scroll to top wghen clicking filter checkbox.
+
 = 20200512 =
 * Updated all libraries like tippy, popper, fullCalendar and moment.
 

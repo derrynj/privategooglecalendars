@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200512
+Version: 20200513
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200512');
+define('PGC_PLUGIN_VERSION', '20200513');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -358,25 +358,14 @@ function pgc_enqueue_scripts() {
     'trans' => [
       'all_day' => __('All day', 'private-google-calendars'),
       'created_by' => __('Created by', 'private-google-calendars'),
-      'go_to_event' => __('Go to event', 'private-google-calendars')
+      'go_to_event' => __('Go to event', 'private-google-calendars'),
+      'unknown_error' => __('Unknown error', 'private-google-calendars'),
+      'request_error' => __('Request error', 'private-google-calendars'),
+      'loading' => __('Loading', 'private-google-calendars')
     ]
   ]);
   
 }
-
-// /**
-//  * Validates date that should be in MySQL format (Y-m-d) optionally with T00:00:00 appended.
-//  * @return valid $date with T00:00:00Z time format appended or false
-//  */
-// function pgc_validate_date($date, $addTime = 'T00:00:00Z') {
-//   if (preg_match("/^\d{4}\-\d{2}\-\d{2}$/", $date)) {
-//     return $date . $addTime;
-//   }
-//   if (preg_match("/^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}$/", $date)) {
-//     return $date . 'Z';
-//   }
-//   return false;
-// }
 
 /**
  * Handle AJAX request from frontend.
@@ -393,14 +382,6 @@ function pgc_ajax_get_calendar() {
       throw new Exception(PGC_ERRORS_INVALID_FORMAT);
     }
 
-    // $start = pgc_validate_date($_POST['start']);
-    // if (!$start) {
-    //   throw new Exception(PGC_ERRORS_INVALID_FORMAT);
-    // }
-    // $end = pgc_validate_date($_POST['end']);
-    // if (!$end) {
-    //   throw new Exception(PGC_ERRORS_INVALID_FORMAT);
-    // }
     // Start and end are in ISO8601 string format with timezone offset (e.g. 2018-09-01T12:30:00-05:00)
     $start = $_POST['start'];
     $end = $_POST['end'];
@@ -428,11 +409,6 @@ function pgc_ajax_get_calendar() {
       }
     }
 
-    //$calendarList = getDecoded('pgc_calendarlist');
-    //if (empty($calendarList)) {
-    //  throw new Exception(PGC_ERRORS_NO_CALENDARS);
-    //}
-
     $cacheTime = get_option('pgc_cache_time'); // empty == no cache!
 
     // We can have mutiple calendars with different calendar selections,
@@ -441,19 +417,7 @@ function pgc_ajax_get_calendar() {
     
     $transientItems = !empty($cacheTime) ? get_transient($transientKey) : false;
 
-    $calendarListByKey = null;
-    //if (!empty($_POST['isPublic'])) {
-    //  $calendarListByKey = [];
-    //  foreach ($thisCalendarids as $calId) {
-    //    $calendarListByKey[$calId] = [
-    //      'summary' => $calId,
-    //      'backgroundColor' => 'rgb(121, 134, 203)'
-    //    ];
-    //  }
-    //} else {
-      $calendarListByKey = pgc_get_calendars_by_key($thisCalendarids, $_POST['isPublic']);
-    //}
-
+    $calendarListByKey = pgc_get_calendars_by_key($thisCalendarids, $_POST['isPublic']);
 
     if ($transientItems !== false) {
       wp_send_json(['items' => $transientItems, 'calendars' => $calendarListByKey]);
