@@ -1,7 +1,7 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { InspectorControls } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
-import { CheckboxControl, PanelBody, TextControl, TextareaControl, Modal, HorizontalRule } from '@wordpress/components';
+import { CheckboxControl, PanelBody, TextControl, TextareaControl, Modal, HorizontalRule, SelectControl } from '@wordpress/components';
 
 const defaultFullcalendarConfig = JSON.stringify({
     header: {
@@ -52,7 +52,7 @@ registerBlockType('pgc-plugin/calendar', {
             type: "object",
             default: {
                 public: false,              
-                filter: true,
+                filter: "top",
                 eventpopup: false,
                 eventlink: false,
                 eventdescription: false,
@@ -239,8 +239,11 @@ registerBlockType('pgc-plugin/calendar', {
                     <PanelBody
                         title={window.pgc_trans.calendar_options}
                         initialOpen={true}>
-                        <CheckboxControl className="pgc-sidebar-row" onChange={onCalendarConfigChange.bind('filter')}
-                            label={window.pgc_trans.show_calendar_filter} checked={config.filter} />
+                        <SelectControl value={config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
+                            {value: '', label: window.pgc_trans.hide_filter},
+                            {value: 'top', label: window.pgc_trans.show_filter_top},
+                            {value: 'bottom', label: window.pgc_trans.show_filter_bottom}
+                        ]} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={setShowConfigArea}
                             label={window.pgc_trans.edit_fullcalendar_config} checked={showConfigArea} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={onHideoptionsChange.bind('hidepassed')}
@@ -279,7 +282,11 @@ registerBlockType('pgc-plugin/calendar', {
             attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
         }
         Object.keys(config).forEach(function(key) {
-            attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
+            if (key === 'filter') {
+                attrsArray.push(key + '="' + (config[key]) + '"');
+            } else {
+                attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
+            }
         });
 
         attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
@@ -306,8 +313,93 @@ registerBlockType('pgc-plugin/calendar', {
             attrsArray.push(key + '="' + attrs[key] + '"');
         });
 
-        console.log(attrsArray);
-
         return <p>[pgc {attrsArray.join(" ")}]</p>
     },
+    deprecated: [
+        {
+            attributes: {
+                calendars: {
+                    type: "object",
+                    default: {}
+                },
+                config: {
+                    type: "object",
+                    default: {
+                        public: false,              
+                        filter: true,
+                        eventpopup: false,
+                        eventlink: false,
+                        eventdescription: false,
+                        eventlocation: false,
+                        eventattendees: false,
+                        eventattachments: false,
+                        eventcreator: false,
+                        eventcalendarname: false
+                    }
+                },
+                fullcalendarconfig: {
+                    type: "string",
+                    default: ""
+                },
+                publiccalendarids: {
+                    type: "string",
+                    default: ""
+                },
+                hideoptions: {
+                    type: "object",
+                    default: {
+                        hidefuture: false,
+                        hidefuturedays: 0,
+                        hidepassed: false,
+                        hidepasseddays: 0,
+                    }
+                }
+            },
+            save: function(props) {
+                const attrs = {};
+                const attrsArray = [];
+                const config = props.attributes.config;
+                const hideoptions = props.attributes.hideoptions;
+                const fullcalendarconfig = props.attributes.fullcalendarconfig;
+                let hasValidConfig = false;
+                try {
+                    hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
+                } catch (ex) {
+                    //console.log(ex);
+                }
+                if (hasValidConfig) {
+                    attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
+                }
+                Object.keys(config).forEach(function(key) {
+                    attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
+                });
+
+                attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
+                attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
+                
+                if (props.attributes.config.public) {
+                    attrs.calendarids = props.attributes.publiccalendarids;
+                } else {
+                    if (Object.keys(props.attributes.calendars).length) {
+                        const calendarids = [];
+                        Object.keys(props.attributes.calendars).forEach(function(id) {
+                            if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
+                                calendarids.push(id);
+                            }
+                        });
+                        if (calendarids.length) {
+                            attrs.calendarids = calendarids.join(",");
+                        }
+            
+                    }
+                }
+
+                Object.keys(attrs).forEach(function(key) {
+                    attrsArray.push(key + '="' + attrs[key] + '"');
+                });
+
+                return <p>[pgc {attrsArray.join(" ")}]</p>
+            }
+        }
+    ]
 } );
