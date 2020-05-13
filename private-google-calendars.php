@@ -147,7 +147,10 @@ function pgc_register_block() {
     'malformed_json_short' => __('Malformed JSON', 'private-google-calendars'),
     'fullcalendar_config' => __('FullCalendar config', 'private-google-calendars'),
     'copy_default_fullcalendar_config' => __('Copy default FullCalendar config', 'private-google-calendars'),
-    'comma_separated_list_calendar_ids' => __('Comma separated list of public calendar IDs', 'private-google-calendars')
+    'comma_separated_list_calendar_ids' => __('Comma separated list of public calendar IDs', 'private-google-calendars'),
+    'show_filter_bottom' => __('Show filter at bottom', 'private-google-calendars'),
+    'show_filter_top' => __('Show filter at top', 'private-google-calendars'),
+    'hide_filter' => __('Hide filter', 'private-google-calendars'),
   ];
 
   wp_add_inline_script('pgc-plugin-script', 'window.pgc_selected_calendars=' . json_encode($selectedCalendars) . ';', 'before');
@@ -181,7 +184,7 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
     ]
   ];
   $userConfig = $defaultConfig; // copy
-  $userFilter = 'true';
+  $userFilter = 'top';
   $userEventPopup = 'true';
   $userEventLink = 'false';
   $userHidePassed = 'false';
@@ -201,7 +204,7 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
       continue;
     }
     if ($key === 'filter') {
-      $userFilter = $value;
+      $userFilter = $value === 'true' ? 'top' : $value;
       continue;
     }
     if ($key === 'eventpopup') {
@@ -285,14 +288,16 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
     $dataCalendarIds = 'data-calendarids=\'' . json_encode(array_map('trim', explode(',', $calendarIds))) . '\'';
   }
 
-  return '<div class="pgc-calendar-wrapper pgc-calendar-page"><div class="pgc-calendar-filter"></div><div '
+  $filterHTML = '<div class="pgc-calendar-filter"></div>';
+
+  return '<div class="pgc-calendar-wrapper pgc-calendar-page">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
     . $dataCalendarIds . ' data-filter=\'' . $userFilter . '\' data-eventpopup=\'' . $userEventPopup . '\' data-eventlink=\''
     . $userEventLink . '\' data-eventdescription=\'' . $userEventDescription . '\' data-eventlocation=\''
     . $userEventLocation . '\' data-eventattachments=\'' . $userEventAttachments . '\' data-eventattendees=\''
     . $userEventAttendees . '\' data-eventcreator=\'' . $userEventCreator . '\' data-eventcalendarname=\''
     . $userEventCalendarname . '\' data-hidefuture=\'' . $userHideFuture . '\' data-hidepassed=\''
     . $userHidePassed . '\' data-config=\'' . json_encode($userConfig) . '\' data-locale="'
-    . get_locale() . '" data-public=\'' . $isPublic . '\' class="pgc-calendar"></div></div>';
+    . get_locale() . '" data-public=\'' . $isPublic . '\' class="pgc-calendar"></div>' . ($userFilter === 'bottom' ? $filterHTML : '') . '</div>';
 }
 
 /**
@@ -1381,7 +1386,8 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
     $isPublic = $this->instanceOptionToBooleanString($instance, 'public', 'false');
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : "";
-    $filter = $this->instanceOptionToBooleanString($instance, 'filter', 'true');
+    //$filter = $this->instanceOptionToBooleanString($instance, 'filter', 'true');
+    $filter = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
     $eventpopup = $this->instanceOptionToBooleanString($instance, 'eventpopup', 'true');
     $eventlink = $this->instanceOptionToBooleanString($instance, 'eventlink', 'false');
     $eventdescription = $this->instanceOptionToBooleanString($instance, 'eventdescription', 'false');
@@ -1411,9 +1417,11 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
     echo $args['before_widget'];
 
+    $filterHTML = '<div class="pgc-calendar-filter"></div>';
+
     ?>
     <div class="pgc-calendar-wrapper pgc-calendar-widget">
-      <div class="pgc-calendar-filter"></div>
+      <?php if ($filter === 'top') echo $filterHTML; ?>
       <div
           data-public='<?php echo $isPublic; ?>'
           data-config='<?php echo json_encode($config); ?>'
@@ -1431,6 +1439,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
           data-hidefuture='<?php echo $hidefuture === 'true' ? $hidefuturedays : 'false'; ?>'
           data-locale='<?php echo get_locale(); ?>'
           class="pgc-calendar"></div>
+          <?php if ($filter === 'bottom') echo $filterHTML; ?>
     </div>
     <?php
 
@@ -1444,7 +1453,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : '';
     
-    $filterValue = isset($instance['filter']) ? $instance['filter'] === 'true' : true;
+    $filterValue = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
     $eventpopupValue = isset($instance['eventpopup']) ? $instance['eventpopup'] === 'true' : true;
     $eventlinkValue = isset($instance['eventlink']) ? $instance['eventlink'] === 'true' : false;
     $eventdescriptionValue = isset($instance['eventdescription']) ? $instance['eventdescription'] === 'true' : false;
@@ -1558,12 +1567,13 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
       <p>
       <strong class="pgc-calendar-widget-row"><?php _e('Calendar options', 'private-google-calendars'); ?></strong>
-      <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('filter'); ?>"><input type="checkbox"
-          <?php checked($filterValue, true, true); ?>
-          id="<?php echo $this->get_field_id('filter'); ?>"
-          name="<?php echo $this->get_field_name('filter'); ?>"
-          value="true" />
-        <?php _e('Show calendar filter'); ?></label>
+      <label><select
+        id="<?php echo $this->get_field_id('filter'); ?>"
+        name="<?php echo $this->get_field_name('filter'); ?>">
+        <option value=''><?php _e('Hide filter', 'private-google-calendars'); ?></option>
+        <option <?php selected($filterValue, 'top', true); ?> value='top'><?php _e('Show filter at top', 'private-google-calendars'); ?></option>
+        <option <?php selected($filterValue, 'bottom', true); ?> value='bottom'><?php _e('Show filter at bottom', 'private-google-calendars'); ?></option>
+      </select></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $hidepassedCheckboxId; ?>">      
       <input type="checkbox"

@@ -219,12 +219,14 @@
       });
     }
 
-    $calendarFilter.addEventListener("change", function(e) {
-      selectedCalIds = Array.prototype.map.call(calendarWrapper.querySelectorAll(".pgc-calendar-filter-wrapper input[type='checkbox']:checked"), function(item) {
-        return item.value;
+    if ($calendarFilter) {
+      $calendarFilter.addEventListener("change", function(e) {
+        selectedCalIds = Array.prototype.map.call(calendarWrapper.querySelectorAll(".pgc-calendar-filter-wrapper input[type='checkbox']:checked"), function(item) {
+          return item.value;
+        });
+        setEvents();
       });
-      setEvents();
-    });
+    }
 
     var loadingTimer = null;
 

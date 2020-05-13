@@ -125,8 +125,12 @@ tr[data-tippy-content] {
   visibility: visible;
 }
 
-.pgc-calendar-filter {
+.pgc-calendar-filter:first-child {
   margin-bottom:1.5em;
+}
+
+.pgc-calendar-filter:last-child {
+  margin-top:1.5em;
 }
 
 .pgc-event-title {
