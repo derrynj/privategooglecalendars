@@ -239,7 +239,7 @@ registerBlockType('pgc-plugin/calendar', {
                     <PanelBody
                         title={window.pgc_trans.calendar_options}
                         initialOpen={true}>
-                        <SelectControl value={config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
+                        <SelectControl value={config.filter === true ? "top" : config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
                             { value: '', label: window.pgc_trans.hide_filter },
                             { value: 'top', label: window.pgc_trans.show_filter_top },
                             { value: 'bottom', label: window.pgc_trans.show_filter_bottom }
