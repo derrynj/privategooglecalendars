@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200514 =
+* Place filter on top or bottom of calendar.
+
 = 20200513 =
 * Loading and error element can be translated.
 * Better error message displayed.

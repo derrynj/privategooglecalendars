@@ -27,18 +27,18 @@ function hasValidFullCalendarConfigValueCheck(value) {
     }
 }
 
-const MyInfoModal = function(props) {
+const MyInfoModal = function (props) {
     return (
         <Modal
             title="FullCalendar config"
-            onRequestClose={ props.onClose }>
+            onRequestClose={props.onClose}>
             <p dangerouslySetInnerHTML={{ __html: window.pgc_trans.copy_fullcalendar_config_info }} />
             <p dangerouslySetInnerHTML={{ __html: window.pgc_trans.fullcalendar_docs_link }} />
 
         </Modal>
     );
 };
- 
+
 registerBlockType('pgc-plugin/calendar', {
     title: 'Private Google Calendars',
     icon: 'calendar',
@@ -51,7 +51,7 @@ registerBlockType('pgc-plugin/calendar', {
         config: {
             type: "object",
             default: {
-                public: false,              
+                public: false,
                 filter: "top",
                 eventpopup: false,
                 eventlink: false,
@@ -90,7 +90,7 @@ registerBlockType('pgc-plugin/calendar', {
 
         const calendars = props.attributes.calendars;
         let selectedCalendarCount = 0;
-        Object.keys(calendars).forEach(function(key) {
+        Object.keys(calendars).forEach(function (key) {
             if (calendars[key]) selectedCalendarCount += 1;
         });
         const config = props.attributes.config;
@@ -99,32 +99,32 @@ registerBlockType('pgc-plugin/calendar', {
         const publiccalendarids = props.attributes.publiccalendarids;
         const isPublic = props.attributes.config.public;
 
-        const onCalendarSelectionChange = function(newValue) {
+        const onCalendarSelectionChange = function (newValue) {
             props.setAttributes(getNewUpdatedObject(calendars, "calendars", this, newValue));
         };
 
-        const onCalendarConfigChange = function(newValue) {
+        const onCalendarConfigChange = function (newValue) {
             props.setAttributes(getNewUpdatedObject(config, "config", this, newValue));
         };
 
-        const onHideoptionsChange = function(newValue) {
+        const onHideoptionsChange = function (newValue) {
             props.setAttributes(getNewUpdatedObject(hideoptions, "hideoptions", this, newValue));
         };
 
-        const onFullCalendarConfigChange = function(newValue) {
+        const onFullCalendarConfigChange = function (newValue) {
             setHasValidFullCalendarConfigValue(hasValidFullCalendarConfigValueCheck(newValue));
-            props.setAttributes({fullcalendarconfig: newValue === "" ? "" : newValue});
+            props.setAttributes({ fullcalendarconfig: newValue === "" ? "" : newValue });
         };
 
-        const onPublicChange = function(newValue) {
+        const onPublicChange = function (newValue) {
             onCalendarConfigChange.call('public', newValue);
         };
 
-        const onPublicCalendarIdsChange = function(newValue) {
-            props.setAttributes({publiccalendarids: newValue});
+        const onPublicCalendarIdsChange = function (newValue) {
+            props.setAttributes({ publiccalendarids: newValue });
         };
 
-        const onAreaKeyDown = function(e) {
+        const onAreaKeyDown = function (e) {
             if (e.keyCode == 9) {
                 e.preventDefault();
                 const area = e.target;
@@ -142,7 +142,7 @@ registerBlockType('pgc-plugin/calendar', {
         if (!isPublic) {
             calendarList = Object.keys(window.pgc_selected_calendars).map((id) => {
                 const calendar = window.pgc_selected_calendars[id];
-                return <CheckboxControl disabled={isPublic} style={{backgroundColor: calendar.backgroundColor}} className="pgc-sidebar-row" onChange={onCalendarSelectionChange.bind(id)}
+                return <CheckboxControl disabled={isPublic} style={{ backgroundColor: calendar.backgroundColor }} className="pgc-sidebar-row" onChange={onCalendarSelectionChange.bind(id)}
                     label={calendar.summary} checked={(id in calendars) && calendars[id]} />
             });
             if (!calendarList.length) {
@@ -166,7 +166,7 @@ registerBlockType('pgc-plugin/calendar', {
         });
 
         const hidePassedDays = hideoptions.hidepassed
-            ? 
+            ?
             <TextControl label={`${window.pgc_trans.more_than} ${hideoptions.hidepasseddays} ${window.pgc_trans.days_ago}`} type="number" min={0}
                 value={hideoptions.hidepasseddays} onChange={onHideoptionsChange.bind('hidepasseddays')} />
             : null;
@@ -184,14 +184,14 @@ registerBlockType('pgc-plugin/calendar', {
                     if (isSavingPost && !isAutosavingPost) {
                         if (!hasValidFullCalendarConfigValue) {
                             // Infinite loop when directly called, don't know why.
-                            let t = setTimeout(function() {
+                            let t = setTimeout(function () {
                                 clearTimeout(t);
                                 wp.data.dispatch("core/notices").createWarningNotice(window.pgc_trans.malformed_json);
                             }, 0);
                             unsubscribe();
                         }
                         if (isPublic && !publiccalendarids) {
-                            let t = setTimeout(function() {
+                            let t = setTimeout(function () {
                                 clearTimeout(t);
                                 wp.data.dispatch("core/notices").createWarningNotice(window.pgc_trans.enter_one_or_more_public_calendar_ids);
                             }, 0);
@@ -212,7 +212,7 @@ registerBlockType('pgc-plugin/calendar', {
                     label={window.pgc_trans.fullcalendar_config}
                     placeHolder={defaultFullcalendarConfig} onChange={onFullCalendarConfigChange} />
                 <div className="pgc-copy-link">
-        <a href="#" onClick={(e) => {e.preventDefault(); onFullCalendarConfigChange(defaultFullcalendarConfig)}}>{window.pgc_trans.copy_default_fullcalendar_config}</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); onFullCalendarConfigChange(defaultFullcalendarConfig) }}>{window.pgc_trans.copy_default_fullcalendar_config}</a>
                     <span onClick={() => setShowInfoModal(true)} class="dashicons dashicons-editor-help"></span>
                 </div>
             </Fragment>
@@ -224,7 +224,7 @@ registerBlockType('pgc-plugin/calendar', {
             </Fragment>
         ) : null
 
-        const infoModal = showInfoModal ? MyInfoModal({onClose: () => {setShowInfoModal(false)}}) : null;
+        const infoModal = showInfoModal ? MyInfoModal({ onClose: () => { setShowInfoModal(false) } }) : null;
 
         return (
             <Fragment>
@@ -240,9 +240,9 @@ registerBlockType('pgc-plugin/calendar', {
                         title={window.pgc_trans.calendar_options}
                         initialOpen={true}>
                         <SelectControl value={config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
-                            {value: '', label: window.pgc_trans.hide_filter},
-                            {value: 'top', label: window.pgc_trans.show_filter_top},
-                            {value: 'bottom', label: window.pgc_trans.show_filter_bottom}
+                            { value: '', label: window.pgc_trans.hide_filter },
+                            { value: 'top', label: window.pgc_trans.show_filter_top },
+                            { value: 'bottom', label: window.pgc_trans.show_filter_bottom }
                         ]} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={setShowConfigArea}
                             label={window.pgc_trans.edit_fullcalendar_config} checked={showConfigArea} />
@@ -281,7 +281,7 @@ registerBlockType('pgc-plugin/calendar', {
         if (hasValidConfig) {
             attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
         }
-        Object.keys(config).forEach(function(key) {
+        Object.keys(config).forEach(function (key) {
             if (key === 'filter') {
                 attrsArray.push(key + '="' + (config[key]) + '"');
             } else {
@@ -291,13 +291,13 @@ registerBlockType('pgc-plugin/calendar', {
 
         attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
         attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
-        
+
         if (props.attributes.config.public) {
             attrs.calendarids = props.attributes.publiccalendarids;
         } else {
             if (Object.keys(props.attributes.calendars).length) {
                 const calendarids = [];
-                Object.keys(props.attributes.calendars).forEach(function(id) {
+                Object.keys(props.attributes.calendars).forEach(function (id) {
                     if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
                         calendarids.push(id);
                     }
@@ -305,11 +305,11 @@ registerBlockType('pgc-plugin/calendar', {
                 if (calendarids.length) {
                     attrs.calendarids = calendarids.join(",");
                 }
-    
+
             }
         }
 
-        Object.keys(attrs).forEach(function(key) {
+        Object.keys(attrs).forEach(function (key) {
             attrsArray.push(key + '="' + attrs[key] + '"');
         });
 
@@ -325,7 +325,7 @@ registerBlockType('pgc-plugin/calendar', {
                 config: {
                     type: "object",
                     default: {
-                        public: false,              
+                        public: false,
                         filter: true,
                         eventpopup: false,
                         eventlink: false,
@@ -355,7 +355,7 @@ registerBlockType('pgc-plugin/calendar', {
                     }
                 }
             },
-            save: function(props) {
+            save: function (props) {
                 const attrs = {};
                 const attrsArray = [];
                 const config = props.attributes.config;
@@ -370,19 +370,19 @@ registerBlockType('pgc-plugin/calendar', {
                 if (hasValidConfig) {
                     attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
                 }
-                Object.keys(config).forEach(function(key) {
+                Object.keys(config).forEach(function (key) {
                     attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
                 });
 
                 attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
                 attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
-                
+
                 if (props.attributes.config.public) {
                     attrs.calendarids = props.attributes.publiccalendarids;
                 } else {
                     if (Object.keys(props.attributes.calendars).length) {
                         const calendarids = [];
-                        Object.keys(props.attributes.calendars).forEach(function(id) {
+                        Object.keys(props.attributes.calendars).forEach(function (id) {
                             if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
                                 calendarids.push(id);
                             }
@@ -390,11 +390,11 @@ registerBlockType('pgc-plugin/calendar', {
                         if (calendarids.length) {
                             attrs.calendarids = calendarids.join(",");
                         }
-            
+
                     }
                 }
 
-                Object.keys(attrs).forEach(function(key) {
+                Object.keys(attrs).forEach(function (key) {
                     attrsArray.push(key + '="' + attrs[key] + '"');
                 });
 
@@ -402,4 +402,4 @@ registerBlockType('pgc-plugin/calendar', {
             }
         }
     ]
-} );
+});
