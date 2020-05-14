@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200515 =
+* Filter top default if true.
+
 = 20200514 =
 * Place filter on top or bottom of calendar.
 
