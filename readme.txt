@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200615 =
+* Added 'moment' plugin so you can use date formatting strings.
+
 = 20200515 =
 * Filter top default if true.
 

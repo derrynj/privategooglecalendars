@@ -386,7 +386,7 @@
     }
 
     fullCalendar = new FullCalendar.Calendar($calendar, Object.assign({
-      plugins: ['momentTimezone', 'dayGrid', 'list', 'timeGrid'],
+      plugins: ['moment', 'momentTimezone', 'dayGrid', 'list', 'timeGrid'],
       defaultView: 'dayGridMonth',
       nowIndicator: true,
       columnHeader: true,
