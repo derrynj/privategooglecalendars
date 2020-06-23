@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.4.1
+Tested up to: 5.4.2
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -61,6 +61,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/mai
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
 
 == Changelog ==
+
+= 20200623 =
+* Set default of PGC_EVENTS_MAX_RESULTS to 250.
+* Make PGC_EVENTS_MAX_RESULTS configurable in wp-config.php.
 
 = 20200615 =
 * Added 'moment' plugin so you can use date formatting strings.

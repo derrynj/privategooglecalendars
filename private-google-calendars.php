@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200615
+Version: 20200623
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,14 +12,17 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200615');
+define('PGC_PLUGIN_VERSION', '20200623');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
 }
 
 define('PGC_TRANSIENT_PREFIX', 'pgc_ev_');
-define('PGC_EVENTS_MAX_RESULTS', 100);
+
+if (!defined('PGC_EVENTS_MAX_RESULTS')) {
+  define('PGC_EVENTS_MAX_RESULTS', 250);
+}
 
 // Priority for the enqueue css and javascript.
 // We need to be sure to load them after the Wordpress theme css files, so we can override some things to make the fullcalendar look good.
