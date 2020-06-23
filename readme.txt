@@ -62,6 +62,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200623 =
+* Set default of PGC_EVENTS_MAX_RESULTS to 250.
+* Make PGC_EVENTS_MAX_RESULTS configurable in wp-config.php.
+
 = 20200615 =
 * Added 'moment' plugin so you can use date formatting strings.
 
