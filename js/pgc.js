@@ -456,6 +456,7 @@
       while (popEl) {
         if (popEl.classList && popEl.classList.contains("tippy-content")) {
           // We have a link inside a tippy-content, so make it _blank by default.
+          // TODO: maybe make it a setting?
           e.preventDefault();
           window.open(el.getAttribute("href"), "_blank");
           break;
