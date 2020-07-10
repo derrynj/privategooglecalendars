@@ -247,6 +247,8 @@
       },
       eventRender: function(info) {
 
+        console.log(info);
+
         if (showEventPopup) {
           var texts = ['<span class="pgc-popup-draghandle dashicons dashicons-screenoptions"></span><div class="pgc-popup-row pgc-event-title"><div class="pgc-popup-row-icon"><span></span></div><div class="pgc-popup-row-value">' + info.event.title + '</div></div>'];
 
@@ -283,7 +285,7 @@
           }
           if (showEventAttachments && info.event.extendedProps.attachments && info.event.extendedProps.attachments.length) {
             texts.push('<div class="pgc-popup-row pgc-event-attachments"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-paperclip"></span></div><div class="pgc-popup-row-value"><ul>' + info.event.extendedProps.attachments.map(function(attachment) {
-              return '<li><a target="__blank" href="' + attachment.fileUrl + '">' + attachment.title + '</a></li>';
+              return '<li><a rel="noopener noreferrer" target="_blank" href="' + attachment.fileUrl + '">' + attachment.title + '</a></li>';
             }).join('<br>') + '</ul></div></div>');
           }
           var hasCreator = showEventCreator && info.event.extendedProps.creator && (info.event.extendedProps.creator.email || info.event.extendedProps.creator.displayName);
@@ -301,9 +303,10 @@
             texts.push('</div></div>');
           }
           if (showEventLink) {
-            texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a target="__blank" href="' + info.event.extendedProps.htmlLink + '">' + pgc_object.trans.go_to_event + '</a></div></div>');
+            texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a rel="noopener noreferrer" target="_blank" href="' + info.event.extendedProps.htmlLink + '">' + pgc_object.trans.go_to_event + '</a></div></div>');
           }
           info.el.setAttribute("data-tippy-content",  texts.join("\n"));
+          info.el.setAttribute("data-calendarid", info.event.extendedProps.calId);
         }
       },
       events: function(arg, successCcallback, failureCallback) {
@@ -448,6 +451,23 @@
     document.body.removeEventListener("mouseup", onBodyMouseUp);  
   }
 
+  function onInEventClick(e) {
+    var el = e.target || e.srcElement;
+    if (el.tagName.toLowerCase() === "a" && el.getAttribute("href")) {
+      var popEl = el;
+      while (popEl) {
+        if (popEl.classList && popEl.classList.contains("tippy-content")) {
+          // We have a link inside a tippy-content, so make it _blank by default.
+          e.preventDefault();
+          window.open(el.getAttribute("href"), "_blank");
+          break;
+        }
+        popEl = popEl.parentNode;
+      }
+    }
+  }
+
   document.body.addEventListener("mousedown", onBodyMouseDown);
+  document.body.addEventListener("click", onInEventClick);
 
 }(this));

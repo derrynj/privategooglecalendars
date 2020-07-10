@@ -62,6 +62,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200710 =
+* Added data-calendarid attribute to each .fc-event so you can manipulate them.
+* Links in the event popups now always open in separate tab.
+
 = 20200623 =
 * Set default of PGC_EVENTS_MAX_RESULTS to 250.
 * Make PGC_EVENTS_MAX_RESULTS configurable in wp-config.php.
