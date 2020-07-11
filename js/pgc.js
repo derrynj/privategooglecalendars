@@ -407,7 +407,15 @@
     theme: "pgc",
     interactive: true,
     appendTo: document.body,
-    theme: 'light-border'
+    theme: 'light-border',
+    onMount: function(instance) {
+      Array.prototype.forEach.call(instance.popper.querySelectorAll("a"), function(a) {
+        if (!a.getAttribute("target")) {
+          a.setAttribute("target", "_blank");
+          a.setAttribute("rel", "noopener noreferrer");
+        }
+      });
+    }
   });
 
   var startClientX = 0;
@@ -449,24 +457,6 @@
     document.body.removeEventListener("mouseup", onBodyMouseUp);  
   }
 
-  function onInEventClick(e) {
-    var el = e.target || e.srcElement;
-    if (el.tagName.toLowerCase() === "a" && el.getAttribute("href")) {
-      var popEl = el;
-      while (popEl) {
-        if (popEl.classList && popEl.classList.contains("tippy-content")) {
-          // We have a link inside a tippy-content, so make it _blank by default.
-          // TODO: maybe make it a setting?
-          e.preventDefault();
-          window.open(el.getAttribute("href"), "_blank");
-          break;
-        }
-        popEl = popEl.parentNode;
-      }
-    }
-  }
-
   document.body.addEventListener("mousedown", onBodyMouseDown);
-  document.body.addEventListener("click", onInEventClick);
 
 }(this));

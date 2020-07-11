@@ -62,6 +62,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200711 =
+* Fix for links open in separate tab. Now target=_blank is injected into the A tags instead of adding an event listener.
+
 = 20200710 =
 * Added data-calendarid attribute to each .fc-event so you can manipulate them.
 * Links in the event popups now always open in separate tab.
