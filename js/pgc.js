@@ -115,6 +115,11 @@
       config[underscoreToUpper(key)] = value;
     });
 
+    // New option for firstDay: +0, +1, +2, etc. instead of 0, 1, 2, etc. ==> FullCalendar expects day number (Sunday = 0), so translate it
+    if (("firstDay" in config) && !int_reg.test(config.firstDay)) {
+      config.firstDay = parseInt(moment().add(config.firstDay, 'd').format('d'), 10);
+    }
+
     locale = config.locale;
 
     moment.locale(locale);

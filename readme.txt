@@ -14,6 +14,8 @@ Display multiple private and public Google Calendars
 
 This plugin can display multiple private (and public) Google calendars with a shortcode, Gutenberg block or as a widget.
 
+See the [webpage]https://blog.michielvaneerd.nl/private-google-calendars for more information.
+
 = Features =
 
 * Access to _private_ (and public) calendars by using OAuth2 or an API key.
@@ -29,10 +31,6 @@ This plugin can display multiple private (and public) Google calendars with a sh
 4. See the Help tab in the settings screen for information about setting up the OAuth2 access and using the shortcode and/or widget.
 
 == Frequently Asked Questions ==
-
-= Where can I find more information? =
-
-See the [website](https://blog.michielvaneerd.nl/private-google-calendars/) for more information.
 
 = How can I override the calendar look? =
 
@@ -61,6 +59,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/mai
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
 
 == Changelog ==
+
+= 20200717 =
+* Possible to set firstDay / (shortcode = first_day) option to + or -
+* Added PGC_EVENTS_DEFAULT_TITLE
 
 = 20200711 =
 * Fix for links open in separate tab. Now target=_blank is injected into the A tags instead of adding an event listener.

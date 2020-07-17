@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200711
+Version: 20200717
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200711');
+define('PGC_PLUGIN_VERSION', '20200717');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -22,6 +22,10 @@ define('PGC_TRANSIENT_PREFIX', 'pgc_ev_');
 
 if (!defined('PGC_EVENTS_MAX_RESULTS')) {
   define('PGC_EVENTS_MAX_RESULTS', 250);
+}
+
+if (!defined('PGC_EVENTS_DEFAULT_TITLE')) {
+  define('PGC_EVENTS_DEFAULT_TITLE', '');
 }
 
 // Priority for the enqueue css and javascript.
@@ -473,7 +477,7 @@ function pgc_ajax_get_calendar() {
     foreach ($results as $calendarId => $events) {
       foreach ($events as $item) {
         $newItem = [
-          'title' => $item['summary'],
+          'title' => empty($item['summary']) ? PGC_EVENTS_DEFAULT_TITLE : $item['summary'],
           'htmlLink' => $item['htmlLink'],
           'description' => !empty($item['description']) ? $item['description'] : '',
           'calId' => $calendarId,
