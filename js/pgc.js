@@ -347,7 +347,10 @@
                 // Check if we have this calendar - if we get cached items, but someone unselected
                 // a calendar in the admin, we can get items for unselected calendars.
                 if (!(item.calId in calendars)) return;
-                if (!getConfigBackgroundColor(config)) {
+                if (item.bColor) {
+                  item.backgroundColor = item.bColor;
+                  item.textColor = item.fColor;
+                } else if (!getConfigBackgroundColor(config)) {
                   item.backgroundColor = calendars[item.calId].backgroundColor;
                 }
                 items.push(item);

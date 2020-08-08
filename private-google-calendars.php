@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200717
+Version: 20200808
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200717');
+define('PGC_PLUGIN_VERSION', '20200808');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -40,6 +40,7 @@ function initTranslatedDefines() {
   define('PGC_NOTICES_REVOKE_SUCCESS', __('Access revoked. This plugin does not have access to your calendars anymore.', 'private-google-calendars'));
   define('PGC_NOTICES_REMOVE_SUCCESS', sprintf(__('Plugin data removed. Make sure to also manually revoke access to your calendars in the Google <a target="__blank" href="%s">Permissions</a> page!', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
   define('PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS', __('Calendars updated.', 'private-google-calendars'));
+  define('PGC_NOTICES_COLORLIST_UPDATE_SUCCESS', __('Colors updated.', 'private-google-calendars'));
   define('PGC_NOTICES_CACHE_DELETED', __('Cache deleted.', 'private-google-calendars'));
 
   define('PGC_ERRORS_CLIENT_SECRET_MISSING', __('No client secret.', 'private-google-calendars'));
@@ -436,6 +437,8 @@ function pgc_ajax_get_calendar() {
       wp_die();
     }
 
+    $colorList = false; // false means not queried yet / otherwise [] or filled []
+
     $results = [];
 
     $optParams = array(
@@ -495,6 +498,15 @@ function pgc_ajax_get_calendar() {
           $newItem['start'] = $item['start']['dateTime'];
           $newItem['end'] = $item['end']['dateTime'];
           // $newItem['timeZone'] = $item['start']['timeZone']; // TODO? end timezone also exists...
+        }
+        if (!empty($item['colorId'])) {
+          if ($colorList === false) {
+            $colorList = getDecoded('pgc_colorlist', []);
+          }
+          if (array_key_exists('event', $colorList) && array_key_exists($item['colorId'], $colorList['event'])) {
+            $newItem['bColor'] = $colorList['event'][$item['colorId']]['background'];
+            $newItem['fColor'] = $colorList['event'][$item['colorId']]['foreground'];
+          }
         }
 
         $items[] = $newItem; 
@@ -662,6 +674,13 @@ function pgc_show_tools() {
         <?php submit_button(__('Update calendars'), 'small', 'submit-calendarlist', false); ?>
       </form>
 
+  <h2><?php _e('Get colorlist', 'private-google-calendars'); ?></h2>
+  <p><?php _e('Download the colorlist. You only have to use this if you use custom colors for events.', 'private-google-calendars'); ?></p>
+      <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+        <input type="hidden" name="action" value="pgc_colorlist">
+        <?php submit_button(__('Update colorlist'), 'small', 'submit-colorlist', false); ?>
+      </form>
+
   <h2><?php _e('Verify', 'private-google-calendars'); ?></h2>
   <p><?php _e('Verify if have setup everything correctly.', 'private-google-calendars'); ?></p>
   <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
@@ -743,6 +762,29 @@ function pgc_admin_post_calendarlist() {
 
     update_option('pgc_calendarlist', getPrettyJSONString($items), false);
     pgc_add_notice(PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS, 'success', true);
+    exit;
+  } catch (Exception $ex) {
+    pgc_die($ex);
+  }
+}
+
+/**
+ * Admin post action to update color list.
+ */
+add_action('admin_post_pgc_colorlist', 'pgc_admin_post_colorlist');
+function pgc_admin_post_colorlist() {
+  try {
+    $client = getGoogleClient(true);
+    if ($client->isAccessTokenExpired()) {
+      if (!$client->getRefreshToken()) {
+        throw new Exception(PGC_ERRORS_REFRESH_TOKEN_MISSING);
+      }
+      $client->refreshAccessToken();
+    }
+    $service = new PGC_GoogleCalendarClient($client);
+    $items = $service->getColorList();
+    update_option('pgc_colorlist', getPrettyJSONString($items), false);
+    pgc_add_notice(PGC_NOTICES_COLORLIST_UPDATE_SUCCESS, 'success', true);
     exit;
   } catch (Exception $ex) {
     pgc_die($ex);
