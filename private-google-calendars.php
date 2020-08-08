@@ -1447,6 +1447,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
     $isPublic = $this->instanceOptionToBooleanString($instance, 'public', 'false');
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : "";
+    $uncheckedCalendarids = isset($instance['uncheckedcalendarids']) ? $instance['uncheckedcalendarids'] : "";
     //$filter = $this->instanceOptionToBooleanString($instance, 'filter', 'true');
     $filter = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
     $eventpopup = $this->instanceOptionToBooleanString($instance, 'eventpopup', 'true');
@@ -1478,7 +1479,12 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
     echo $args['before_widget'];
 
-    $filterHTML = '<div class="pgc-calendar-filter"></div>';
+    $dataUnchekedCalendarIds = '';
+    if (!empty($uncheckedCalendarids)) {
+      $dataUnchekedCalendarIds = " data-uncheckedcalendarids='" . json_encode(array_map('trim', explode(',', $uncheckedCalendarids))) . "'";
+      //$dataUnchekedCalendarIds = " data-uncheckedcalendarids='" . $uncheckedCalendarids . "'";
+    }
+    $filterHTML = '<div class="pgc-calendar-filter"' . $dataUnchekedCalendarIds . '></div>';
 
     ?>
     <div class="pgc-calendar-wrapper pgc-calendar-widget">
@@ -1513,6 +1519,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $publicValue = isset($instance['public']) ? $instance['public'] === 'true' : false;
     
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : '';
+    $uncheckedCalendarids = isset($instance['uncheckedcalendarids']) ? $instance['uncheckedcalendarids'] : '';
     
     $filterValue = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
     $eventpopupValue = isset($instance['eventpopup']) ? $instance['eventpopup'] === 'true' : true;
@@ -1628,13 +1635,6 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
       <p>
       <strong class="pgc-calendar-widget-row"><?php _e('Calendar options', 'private-google-calendars'); ?></strong>
-      <label><select
-        id="<?php echo $this->get_field_id('filter'); ?>"
-        name="<?php echo $this->get_field_name('filter'); ?>">
-        <option value=''><?php _e('Hide filter', 'private-google-calendars'); ?></option>
-        <option <?php selected($filterValue, 'top', true); ?> value='top'><?php _e('Show filter at top', 'private-google-calendars'); ?></option>
-        <option <?php selected($filterValue, 'bottom', true); ?> value='bottom'><?php _e('Show filter at bottom', 'private-google-calendars'); ?></option>
-      </select></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $hidepassedCheckboxId; ?>">      
       <input type="checkbox"
@@ -1657,6 +1657,21 @@ class Pgc_Calendar_Widget extends WP_Widget {
         <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $hidefutureCheckboxId; ?>"><?php _e('...more than', 'private-google-calendars'); ?> <input min="0" class="pgc_small_numeric_input" type="number" name="<?php echo $this->get_field_name('hidefuturedays'); ?>"
           id="<?php echo $this->get_field_id('hidefuturedays'); ?>"
           value="<?php echo $hidefuturedaysValue; ?>" /> <?php _e('from now', 'private-google-calendars'); ?></label>
+      </p>
+
+      <p>
+      <strong class="pgc-calendar-widget-row"><?php _e('Filter options', 'private-google-calendars'); ?></strong>
+      <label><select
+        id="<?php echo $this->get_field_id('filter'); ?>"
+        name="<?php echo $this->get_field_name('filter'); ?>">
+        <option value=''><?php _e('Hide filter', 'private-google-calendars'); ?></option>
+        <option <?php selected($filterValue, 'top', true); ?> value='top'><?php _e('Show filter at top', 'private-google-calendars'); ?></option>
+        <option <?php selected($filterValue, 'bottom', true); ?> value='bottom'><?php _e('Show filter at bottom', 'private-google-calendars'); ?></option>
+      </select></label>
+      <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('uncheckedcalendarids'); ?>"><?php _e('Unchecked calendar IDs', 'private-google-calendars'); ?>
+      <textarea class="widefat pgc-calendar-codearea pgc-calendar-widget-row"
+        name="<?php echo $this->get_field_name('uncheckedcalendarids'); ?>" id="<?php echo $this->get_field_id('uncheckedcalendarids'); ?>"><?php echo esc_html($uncheckedCalendarids); ?></textarea>
+      </label>
       </p>
 
       <p>
@@ -1826,6 +1841,9 @@ class Pgc_Calendar_Widget extends WP_Widget {
         : '';    
     $instance['publiccalendarids'] = (!empty($new_instance['publiccalendarids']))
         ? strip_tags($new_instance['publiccalendarids'] )
+        : '';
+    $instance['uncheckedcalendarids'] = (!empty($new_instance['uncheckedcalendarids']))
+        ? strip_tags($new_instance['uncheckedcalendarids'] )
         : '';
     $instance['eventpopup'] = (!empty($new_instance['eventpopup']))
         ? strip_tags($new_instance['eventpopup'] )
