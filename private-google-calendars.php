@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200808
+Version: 20200809
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200808');
+define('PGC_PLUGIN_VERSION', '20200809');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -159,6 +159,8 @@ function pgc_register_block() {
     'show_filter_bottom' => __('Show filter at bottom', 'private-google-calendars'),
     'show_filter_top' => __('Show filter at top', 'private-google-calendars'),
     'hide_filter' => __('Hide filter', 'private-google-calendars'),
+    'filter_options' => __('Filter options', 'private-google-calendars'),
+    'filter_uncheckedcalendarids' => __('Unchecked calendar IDs', 'private-google-calendars'),
   ];
 
   wp_add_inline_script('pgc-plugin-script', 'window.pgc_selected_calendars=' . json_encode($selectedCalendars) . ';', 'before');
@@ -204,6 +206,7 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   $userEventCreator = 'false';
   $userEventCalendarname = 'false';
   $calendarIds = '';
+  $uncheckedCalendarIds = ''; // in filter
   $isPublic = 'false';
   // Get all non-fullcalendar known properties
   foreach ($atts as $key => $value) {
@@ -255,6 +258,10 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
       $userEventCalendarname = $value;
       continue;
     }
+    if ($key === 'uncheckedcalendarids' && !empty($value)) {
+      $uncheckedCalendarIds = $value; // comma separated string
+      continue;
+    }
     if ($key === 'calendarids' && !empty($value)) {
       $calendarIds = $value; // comma separated string
       continue;
@@ -296,7 +303,12 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
     $dataCalendarIds = 'data-calendarids=\'' . json_encode(array_map('trim', explode(',', $calendarIds))) . '\'';
   }
 
-  $filterHTML = '<div class="pgc-calendar-filter"></div>';
+  $dataUnchekedCalendarIds = '';
+  if (!empty($uncheckedCalendarIds)) {
+    $dataUnchekedCalendarIds = 'data-uncheckedcalendarids=\'' . json_encode(array_map('trim', explode(',', $uncheckedCalendarIds))) . '\'';
+  }
+
+  $filterHTML = '<div class="pgc-calendar-filter" ' . $dataUnchekedCalendarIds . '></div>';
 
   return '<div class="pgc-calendar-wrapper pgc-calendar-page">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
     . $dataCalendarIds . ' data-filter=\'' . $userFilter . '\' data-eventpopup=\'' . $userEventPopup . '\' data-eventlink=\''

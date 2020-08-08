@@ -90,6 +90,8 @@
     var showEventCreator = castAttrValue($calendar.getAttribute('data-eventcreator'), false);
     var showEventCalendarname = castAttrValue($calendar.getAttribute('data-eventcalendarname'), false);
 
+    var uncheckedCalendarIds = $calendarFilter && $calendarFilter.getAttribute("data-uncheckedcalendarids") ? JSON.parse($calendarFilter.getAttribute("data-uncheckedcalendarids")) : [];
+
     // fullCalendar locales are like this: nl-be OR es
     // The locale we get from WP are en_US OR en.
     var locale = 'en-us';
@@ -178,11 +180,21 @@
 
       allCalendars = calendars;
       
+      // Make sure below happens once.
       if (selectedCalIds !== null) {
         return;
       }
       
       selectedCalIds = Object.keys(calendars); // default all calendars selected
+      if (uncheckedCalendarIds.length) {
+        var tmp = [];
+        selectedCalIds.forEach(function(key) {
+          if (uncheckedCalendarIds.indexOf(key) === -1) {
+            tmp.push(key);
+          }
+        });
+        selectedCalIds = tmp;
+      }
       
       if (!filter) return;
       
@@ -191,7 +203,7 @@
         if (thisCalendarids.length && thisCalendarids.indexOf(key) === -1) {
           return;
         }
-        selectBoxes.push('<input id="id_' + calendarCounter + '_' + index + '" type="checkbox" checked value="' + key + '" />'
+        selectBoxes.push('<input id="id_' + calendarCounter + '_' + index + '" type="checkbox" ' + (uncheckedCalendarIds.indexOf(key) === -1 ? "checked" : "") + ' value="' + key + '" />'
           + '<label for="id_' + calendarCounter + '_' + index + '">'
           + '<span class="pgc-calendar-color" style="background-color:' + (getConfigBackgroundColor(config) || calendars[key].backgroundColor) + '"></span> ' + (calendars[key].summary || key)
           + '</label>');

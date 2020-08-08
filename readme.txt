@@ -60,6 +60,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200809 =
+* Possible to set unchecked calendars for filter.
+
 = 20200808 =
 * Custom event colors are reflected.
 
