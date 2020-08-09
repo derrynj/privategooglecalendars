@@ -71,6 +71,10 @@ registerBlockType('pgc-plugin/calendar', {
             type: "string",
             default: ""
         },
+        uncheckedcalendarids: {
+            type: "string",
+            default: ""
+        },
         hideoptions: {
             type: "object",
             default: {
@@ -98,6 +102,7 @@ registerBlockType('pgc-plugin/calendar', {
         const fullcalendarconfig = props.attributes.fullcalendarconfig;
         const publiccalendarids = props.attributes.publiccalendarids;
         const isPublic = props.attributes.config.public;
+        const uncheckedcalendarids = props.attributes.uncheckedcalendarids;
 
         const onCalendarSelectionChange = function (newValue) {
             props.setAttributes(getNewUpdatedObject(calendars, "calendars", this, newValue));
@@ -122,6 +127,10 @@ registerBlockType('pgc-plugin/calendar', {
 
         const onPublicCalendarIdsChange = function (newValue) {
             props.setAttributes({ publiccalendarids: newValue });
+        };
+
+        const onUncheckedCalendarIdsChange = function (newValue) {
+            props.setAttributes({ uncheckedcalendarids: newValue });
         };
 
         const onAreaKeyDown = function (e) {
@@ -239,11 +248,6 @@ registerBlockType('pgc-plugin/calendar', {
                     <PanelBody
                         title={window.pgc_trans.calendar_options}
                         initialOpen={true}>
-                        <SelectControl value={config.filter === true ? "top" : config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
-                            { value: '', label: window.pgc_trans.hide_filter },
-                            { value: 'top', label: window.pgc_trans.show_filter_top },
-                            { value: 'bottom', label: window.pgc_trans.show_filter_bottom }
-                        ]} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={setShowConfigArea}
                             label={window.pgc_trans.edit_fullcalendar_config} checked={showConfigArea} />
                         <CheckboxControl className="pgc-sidebar-row" onChange={onHideoptionsChange.bind('hidepassed')}
@@ -253,6 +257,15 @@ registerBlockType('pgc-plugin/calendar', {
                             label={window.pgc_trans.hide_future_events} checked={hideoptions.hidefuture} />
                         {hideFutureDays}
                     </PanelBody>
+                    <PanelBody
+                        title={window.pgc_trans.filter_options}>
+                        <SelectControl value={config.filter === true ? "top" : config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
+                            { value: '', label: window.pgc_trans.hide_filter },
+                            { value: 'top', label: window.pgc_trans.show_filter_top },
+                            { value: 'bottom', label: window.pgc_trans.show_filter_bottom }
+                        ]} />
+                        <TextControl label={window.pgc_trans.filter_uncheckedcalendarids} value={uncheckedcalendarids} onChange={onUncheckedCalendarIdsChange} />
+                        </PanelBody>
                     <PanelBody
                         title={window.pgc_trans.popup_options + " (" + (config.eventpopup ? window.pgc_trans.show : window.pgc_trans.hide) + ")"}
                         initialOpen={true}>
@@ -305,8 +318,14 @@ registerBlockType('pgc-plugin/calendar', {
                 if (calendarids.length) {
                     attrs.calendarids = calendarids.join(",");
                 }
-
             }
+        }
+
+        // Only if present set to save function.
+        // This means we don't have to use a deprecated version for this, because in previous versions this was is not present
+        // and thus not displayed in save object.
+        if (props.attributes.uncheckedcalendarids) {
+            attrs.uncheckedcalendarids = props.attributes.uncheckedcalendarids;
         }
 
         Object.keys(attrs).forEach(function (key) {

@@ -60,6 +60,12 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200809 =
+* Possible to set unchecked calendars for filter.
+
+= 20200808 =
+* Custom event colors are reflected.
+
 = 20200717 =
 * Possible to set firstDay / (shortcode = first_day) option to + or -
 * Added PGC_EVENTS_DEFAULT_TITLE
