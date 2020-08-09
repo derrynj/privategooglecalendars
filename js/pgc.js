@@ -90,6 +90,8 @@
     var showEventCreator = castAttrValue($calendar.getAttribute('data-eventcreator'), false);
     var showEventCalendarname = castAttrValue($calendar.getAttribute('data-eventcalendarname'), false);
 
+    var uncheckedCalendarIds = $calendarFilter && $calendarFilter.getAttribute("data-uncheckedcalendarids") ? JSON.parse($calendarFilter.getAttribute("data-uncheckedcalendarids")) : [];
+
     // fullCalendar locales are like this: nl-be OR es
     // The locale we get from WP are en_US OR en.
     var locale = 'en-us';
@@ -114,6 +116,11 @@
       var value = castAttrValue(dataConfig[key]);
       config[underscoreToUpper(key)] = value;
     });
+
+    // New option for firstDay: +0, +1, +2, etc. instead of 0, 1, 2, etc. ==> FullCalendar expects day number (Sunday = 0), so translate it
+    if (("firstDay" in config) && !int_reg.test(config.firstDay)) {
+      config.firstDay = parseInt(moment().add(config.firstDay, 'd').format('d'), 10);
+    }
 
     locale = config.locale;
 
@@ -173,11 +180,21 @@
 
       allCalendars = calendars;
       
+      // Make sure below happens once.
       if (selectedCalIds !== null) {
         return;
       }
       
       selectedCalIds = Object.keys(calendars); // default all calendars selected
+      if (uncheckedCalendarIds.length) {
+        var tmp = [];
+        selectedCalIds.forEach(function(key) {
+          if (uncheckedCalendarIds.indexOf(key) === -1) {
+            tmp.push(key);
+          }
+        });
+        selectedCalIds = tmp;
+      }
       
       if (!filter) return;
       
@@ -186,7 +203,7 @@
         if (thisCalendarids.length && thisCalendarids.indexOf(key) === -1) {
           return;
         }
-        selectBoxes.push('<input id="id_' + calendarCounter + '_' + index + '" type="checkbox" checked value="' + key + '" />'
+        selectBoxes.push('<input id="id_' + calendarCounter + '_' + index + '" type="checkbox" ' + (uncheckedCalendarIds.indexOf(key) === -1 ? "checked" : "") + ' value="' + key + '" />'
           + '<label for="id_' + calendarCounter + '_' + index + '">'
           + '<span class="pgc-calendar-color" style="background-color:' + (getConfigBackgroundColor(config) || calendars[key].backgroundColor) + '"></span> ' + (calendars[key].summary || key)
           + '</label>');
@@ -283,7 +300,7 @@
           }
           if (showEventAttachments && info.event.extendedProps.attachments && info.event.extendedProps.attachments.length) {
             texts.push('<div class="pgc-popup-row pgc-event-attachments"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-paperclip"></span></div><div class="pgc-popup-row-value"><ul>' + info.event.extendedProps.attachments.map(function(attachment) {
-              return '<li><a target="__blank" href="' + attachment.fileUrl + '">' + attachment.title + '</a></li>';
+              return '<li><a rel="noopener noreferrer" target="_blank" href="' + attachment.fileUrl + '">' + attachment.title + '</a></li>';
             }).join('<br>') + '</ul></div></div>');
           }
           var hasCreator = showEventCreator && info.event.extendedProps.creator && (info.event.extendedProps.creator.email || info.event.extendedProps.creator.displayName);
@@ -301,9 +318,10 @@
             texts.push('</div></div>');
           }
           if (showEventLink) {
-            texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a target="__blank" href="' + info.event.extendedProps.htmlLink + '">' + pgc_object.trans.go_to_event + '</a></div></div>');
+            texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a rel="noopener noreferrer" target="_blank" href="' + info.event.extendedProps.htmlLink + '">' + pgc_object.trans.go_to_event + '</a></div></div>');
           }
           info.el.setAttribute("data-tippy-content",  texts.join("\n"));
+          info.el.setAttribute("data-calendarid", info.event.extendedProps.calId);
         }
       },
       events: function(arg, successCcallback, failureCallback) {
@@ -341,7 +359,10 @@
                 // Check if we have this calendar - if we get cached items, but someone unselected
                 // a calendar in the admin, we can get items for unselected calendars.
                 if (!(item.calId in calendars)) return;
-                if (!getConfigBackgroundColor(config)) {
+                if (item.bColor) {
+                  item.backgroundColor = item.bColor;
+                  item.textColor = item.fColor;
+                } else if (!getConfigBackgroundColor(config)) {
                   item.backgroundColor = calendars[item.calId].backgroundColor;
                 }
                 items.push(item);
@@ -386,7 +407,7 @@
     }
 
     fullCalendar = new FullCalendar.Calendar($calendar, Object.assign({
-      plugins: ['momentTimezone', 'dayGrid', 'list', 'timeGrid'],
+      plugins: ['moment', 'momentTimezone', 'dayGrid', 'list', 'timeGrid'],
       defaultView: 'dayGridMonth',
       nowIndicator: true,
       columnHeader: true,
@@ -406,7 +427,15 @@
     theme: "pgc",
     interactive: true,
     appendTo: document.body,
-    theme: 'light-border'
+    theme: 'light-border',
+    onMount: function(instance) {
+      Array.prototype.forEach.call(instance.popper.querySelectorAll("a"), function(a) {
+        if (!a.getAttribute("target")) {
+          a.setAttribute("target", "_blank");
+          a.setAttribute("rel", "noopener noreferrer");
+        }
+      });
+    }
   });
 
   var startClientX = 0;

@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200515
+Version: 20200809
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,14 +12,21 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200515');
+define('PGC_PLUGIN_VERSION', '20200809');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
 }
 
 define('PGC_TRANSIENT_PREFIX', 'pgc_ev_');
-define('PGC_EVENTS_MAX_RESULTS', 100);
+
+if (!defined('PGC_EVENTS_MAX_RESULTS')) {
+  define('PGC_EVENTS_MAX_RESULTS', 250);
+}
+
+if (!defined('PGC_EVENTS_DEFAULT_TITLE')) {
+  define('PGC_EVENTS_DEFAULT_TITLE', '');
+}
 
 // Priority for the enqueue css and javascript.
 // We need to be sure to load them after the Wordpress theme css files, so we can override some things to make the fullcalendar look good.
@@ -33,6 +40,7 @@ function initTranslatedDefines() {
   define('PGC_NOTICES_REVOKE_SUCCESS', __('Access revoked. This plugin does not have access to your calendars anymore.', 'private-google-calendars'));
   define('PGC_NOTICES_REMOVE_SUCCESS', sprintf(__('Plugin data removed. Make sure to also manually revoke access to your calendars in the Google <a target="__blank" href="%s">Permissions</a> page!', 'private-google-calendars'), 'https://myaccount.google.com/permissions'));
   define('PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS', __('Calendars updated.', 'private-google-calendars'));
+  define('PGC_NOTICES_COLORLIST_UPDATE_SUCCESS', __('Colors updated.', 'private-google-calendars'));
   define('PGC_NOTICES_CACHE_DELETED', __('Cache deleted.', 'private-google-calendars'));
 
   define('PGC_ERRORS_CLIENT_SECRET_MISSING', __('No client secret.', 'private-google-calendars'));
@@ -151,6 +159,8 @@ function pgc_register_block() {
     'show_filter_bottom' => __('Show filter at bottom', 'private-google-calendars'),
     'show_filter_top' => __('Show filter at top', 'private-google-calendars'),
     'hide_filter' => __('Hide filter', 'private-google-calendars'),
+    'filter_options' => __('Filter options', 'private-google-calendars'),
+    'filter_uncheckedcalendarids' => __('Unchecked calendar IDs', 'private-google-calendars'),
   ];
 
   wp_add_inline_script('pgc-plugin-script', 'window.pgc_selected_calendars=' . json_encode($selectedCalendars) . ';', 'before');
@@ -196,6 +206,7 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   $userEventCreator = 'false';
   $userEventCalendarname = 'false';
   $calendarIds = '';
+  $uncheckedCalendarIds = ''; // in filter
   $isPublic = 'false';
   // Get all non-fullcalendar known properties
   foreach ($atts as $key => $value) {
@@ -247,6 +258,10 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
       $userEventCalendarname = $value;
       continue;
     }
+    if ($key === 'uncheckedcalendarids' && !empty($value)) {
+      $uncheckedCalendarIds = $value; // comma separated string
+      continue;
+    }
     if ($key === 'calendarids' && !empty($value)) {
       $calendarIds = $value; // comma separated string
       continue;
@@ -288,7 +303,12 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
     $dataCalendarIds = 'data-calendarids=\'' . json_encode(array_map('trim', explode(',', $calendarIds))) . '\'';
   }
 
-  $filterHTML = '<div class="pgc-calendar-filter"></div>';
+  $dataUnchekedCalendarIds = '';
+  if (!empty($uncheckedCalendarIds)) {
+    $dataUnchekedCalendarIds = 'data-uncheckedcalendarids=\'' . json_encode(array_map('trim', explode(',', $uncheckedCalendarIds))) . '\'';
+  }
+
+  $filterHTML = '<div class="pgc-calendar-filter" ' . $dataUnchekedCalendarIds . '></div>';
 
   return '<div class="pgc-calendar-wrapper pgc-calendar-page">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
     . $dataCalendarIds . ' data-filter=\'' . $userFilter . '\' data-eventpopup=\'' . $userEventPopup . '\' data-eventlink=\''
@@ -429,6 +449,8 @@ function pgc_ajax_get_calendar() {
       wp_die();
     }
 
+    $colorList = false; // false means not queried yet / otherwise [] or filled []
+
     $results = [];
 
     $optParams = array(
@@ -470,7 +492,7 @@ function pgc_ajax_get_calendar() {
     foreach ($results as $calendarId => $events) {
       foreach ($events as $item) {
         $newItem = [
-          'title' => $item['summary'],
+          'title' => empty($item['summary']) ? PGC_EVENTS_DEFAULT_TITLE : $item['summary'],
           'htmlLink' => $item['htmlLink'],
           'description' => !empty($item['description']) ? $item['description'] : '',
           'calId' => $calendarId,
@@ -488,6 +510,15 @@ function pgc_ajax_get_calendar() {
           $newItem['start'] = $item['start']['dateTime'];
           $newItem['end'] = $item['end']['dateTime'];
           // $newItem['timeZone'] = $item['start']['timeZone']; // TODO? end timezone also exists...
+        }
+        if (!empty($item['colorId'])) {
+          if ($colorList === false) {
+            $colorList = getDecoded('pgc_colorlist', []);
+          }
+          if (array_key_exists('event', $colorList) && array_key_exists($item['colorId'], $colorList['event'])) {
+            $newItem['bColor'] = $colorList['event'][$item['colorId']]['background'];
+            $newItem['fColor'] = $colorList['event'][$item['colorId']]['foreground'];
+          }
         }
 
         $items[] = $newItem; 
@@ -655,6 +686,13 @@ function pgc_show_tools() {
         <?php submit_button(__('Update calendars'), 'small', 'submit-calendarlist', false); ?>
       </form>
 
+  <h2><?php _e('Get colorlist', 'private-google-calendars'); ?></h2>
+  <p><?php _e('Download the colorlist. You only have to use this if you use custom colors for events.', 'private-google-calendars'); ?></p>
+      <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+        <input type="hidden" name="action" value="pgc_colorlist">
+        <?php submit_button(__('Update colorlist'), 'small', 'submit-colorlist', false); ?>
+      </form>
+
   <h2><?php _e('Verify', 'private-google-calendars'); ?></h2>
   <p><?php _e('Verify if have setup everything correctly.', 'private-google-calendars'); ?></p>
   <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
@@ -736,6 +774,29 @@ function pgc_admin_post_calendarlist() {
 
     update_option('pgc_calendarlist', getPrettyJSONString($items), false);
     pgc_add_notice(PGC_NOTICES_CALENDARLIST_UPDATE_SUCCESS, 'success', true);
+    exit;
+  } catch (Exception $ex) {
+    pgc_die($ex);
+  }
+}
+
+/**
+ * Admin post action to update color list.
+ */
+add_action('admin_post_pgc_colorlist', 'pgc_admin_post_colorlist');
+function pgc_admin_post_colorlist() {
+  try {
+    $client = getGoogleClient(true);
+    if ($client->isAccessTokenExpired()) {
+      if (!$client->getRefreshToken()) {
+        throw new Exception(PGC_ERRORS_REFRESH_TOKEN_MISSING);
+      }
+      $client->refreshAccessToken();
+    }
+    $service = new PGC_GoogleCalendarClient($client);
+    $items = $service->getColorList();
+    update_option('pgc_colorlist', getPrettyJSONString($items), false);
+    pgc_add_notice(PGC_NOTICES_COLORLIST_UPDATE_SUCCESS, 'success', true);
     exit;
   } catch (Exception $ex) {
     pgc_die($ex);
@@ -1386,6 +1447,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
     $isPublic = $this->instanceOptionToBooleanString($instance, 'public', 'false');
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : "";
+    $uncheckedCalendarids = isset($instance['uncheckedcalendarids']) ? $instance['uncheckedcalendarids'] : "";
     //$filter = $this->instanceOptionToBooleanString($instance, 'filter', 'true');
     $filter = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
     $eventpopup = $this->instanceOptionToBooleanString($instance, 'eventpopup', 'true');
@@ -1417,7 +1479,12 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
     echo $args['before_widget'];
 
-    $filterHTML = '<div class="pgc-calendar-filter"></div>';
+    $dataUnchekedCalendarIds = '';
+    if (!empty($uncheckedCalendarids)) {
+      $dataUnchekedCalendarIds = " data-uncheckedcalendarids='" . json_encode(array_map('trim', explode(',', $uncheckedCalendarids))) . "'";
+      //$dataUnchekedCalendarIds = " data-uncheckedcalendarids='" . $uncheckedCalendarids . "'";
+    }
+    $filterHTML = '<div class="pgc-calendar-filter"' . $dataUnchekedCalendarIds . '></div>';
 
     ?>
     <div class="pgc-calendar-wrapper pgc-calendar-widget">
@@ -1452,6 +1519,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $publicValue = isset($instance['public']) ? $instance['public'] === 'true' : false;
     
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : '';
+    $uncheckedCalendarids = isset($instance['uncheckedcalendarids']) ? $instance['uncheckedcalendarids'] : '';
     
     $filterValue = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
     $eventpopupValue = isset($instance['eventpopup']) ? $instance['eventpopup'] === 'true' : true;
@@ -1567,13 +1635,6 @@ class Pgc_Calendar_Widget extends WP_Widget {
 
       <p>
       <strong class="pgc-calendar-widget-row"><?php _e('Calendar options', 'private-google-calendars'); ?></strong>
-      <label><select
-        id="<?php echo $this->get_field_id('filter'); ?>"
-        name="<?php echo $this->get_field_name('filter'); ?>">
-        <option value=''><?php _e('Hide filter', 'private-google-calendars'); ?></option>
-        <option <?php selected($filterValue, 'top', true); ?> value='top'><?php _e('Show filter at top', 'private-google-calendars'); ?></option>
-        <option <?php selected($filterValue, 'bottom', true); ?> value='bottom'><?php _e('Show filter at bottom', 'private-google-calendars'); ?></option>
-      </select></label>
       
       <label class="pgc-calendar-widget-row" for="<?php echo $hidepassedCheckboxId; ?>">      
       <input type="checkbox"
@@ -1596,6 +1657,21 @@ class Pgc_Calendar_Widget extends WP_Widget {
         <label class="pgc-calendar-widget-row" data-linked-id="<?php echo $hidefutureCheckboxId; ?>"><?php _e('...more than', 'private-google-calendars'); ?> <input min="0" class="pgc_small_numeric_input" type="number" name="<?php echo $this->get_field_name('hidefuturedays'); ?>"
           id="<?php echo $this->get_field_id('hidefuturedays'); ?>"
           value="<?php echo $hidefuturedaysValue; ?>" /> <?php _e('from now', 'private-google-calendars'); ?></label>
+      </p>
+
+      <p>
+      <strong class="pgc-calendar-widget-row"><?php _e('Filter options', 'private-google-calendars'); ?></strong>
+      <label><select
+        id="<?php echo $this->get_field_id('filter'); ?>"
+        name="<?php echo $this->get_field_name('filter'); ?>">
+        <option value=''><?php _e('Hide filter', 'private-google-calendars'); ?></option>
+        <option <?php selected($filterValue, 'top', true); ?> value='top'><?php _e('Show filter at top', 'private-google-calendars'); ?></option>
+        <option <?php selected($filterValue, 'bottom', true); ?> value='bottom'><?php _e('Show filter at bottom', 'private-google-calendars'); ?></option>
+      </select></label>
+      <label class="pgc-calendar-widget-row" for="<?php echo $this->get_field_id('uncheckedcalendarids'); ?>"><?php _e('Unchecked calendar IDs', 'private-google-calendars'); ?>
+      <textarea class="widefat pgc-calendar-codearea pgc-calendar-widget-row"
+        name="<?php echo $this->get_field_name('uncheckedcalendarids'); ?>" id="<?php echo $this->get_field_id('uncheckedcalendarids'); ?>"><?php echo esc_html($uncheckedCalendarids); ?></textarea>
+      </label>
       </p>
 
       <p>
@@ -1765,6 +1841,9 @@ class Pgc_Calendar_Widget extends WP_Widget {
         : '';    
     $instance['publiccalendarids'] = (!empty($new_instance['publiccalendarids']))
         ? strip_tags($new_instance['publiccalendarids'] )
+        : '';
+    $instance['uncheckedcalendarids'] = (!empty($new_instance['uncheckedcalendarids']))
+        ? strip_tags($new_instance['uncheckedcalendarids'] )
         : '';
     $instance['eventpopup'] = (!empty($new_instance['eventpopup']))
         ? strip_tags($new_instance['eventpopup'] )
