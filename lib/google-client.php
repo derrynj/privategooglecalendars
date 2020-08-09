@@ -294,6 +294,8 @@ class PGC_GoogleCalendarClient {
   const GOOGLE_CALENDAR_EVENTS_URI = 'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events';
   const GOOGLE_CALENDER_PRIMARY_ID = 'primary';
   const GOOGLE_CALENDARLIST_URI = 'https://www.googleapis.com/calendar/v3/users/me/calendarList';
+  //const GOOGLE_COLORLIST_URI = 'https://www.googleapis.com/calendar/v3/colors';
+  const GOOGLE_COLORLIST_URI = 'https://content.googleapis.com/calendar/v3/colors';
 
   private $googleClient;
 
@@ -304,7 +306,7 @@ class PGC_GoogleCalendarClient {
   public function getEvents($calendarId, $params) {
     $url = str_replace('$calendarId', urlencode($calendarId), self::GOOGLE_CALENDAR_EVENTS_URI);
     // https://developers.google.com/google-apps/calendar/performance#partial-response
-    $params['fields'] = "items(summary,description,start,end,htmlLink,creator,location,attendees,attachments)";
+    $params['fields'] = "items(summary,description,start,end,htmlLink,creator,location,attendees,attachments,colorId)";
     $result = PGC_GoogleClient_Request::doRequest(
       $url,
       $params,
@@ -321,7 +323,7 @@ class PGC_GoogleCalendarClient {
   public function getEventsPublic($calendarId, $params, $apiKey, $referer) {
     $url = str_replace('$calendarId', urlencode($calendarId), self::GOOGLE_CALENDAR_EVENTS_URI);
     // https://developers.google.com/google-apps/calendar/performance#partial-response
-    $params['fields'] = "items(summary,description,start,end,htmlLink,creator,location,attendees,attachments)";
+    $params['fields'] = "items(summary,description,start,end,htmlLink,creator,location,attendees,attachments,colorId)";
     $params['key'] = $apiKey;
     $result = PGC_GoogleClient_Request::doRequest(
       $url,
@@ -365,6 +367,23 @@ class PGC_GoogleCalendarClient {
     );
     $parsed = !empty($result['items']) ? $result['items'] : [];
     return $parsed;
+  }
+
+  public function getColorList() {
+    $result = PGC_GoogleClient_Request::doRequest(
+      self::GOOGLE_COLORLIST_URI,
+      null,
+      'GET',
+      [
+        'Authorization' => 'Bearer ' . $this->googleClient->getAccessToken()
+      ]
+    );
+    $calendar = !empty($result['calendar']) ? $result['calendar'] : [];
+    $event = !empty($result['event']) ? $result['event'] : [];
+    return [
+      'calendar' => $calendar,
+      'event' => $event
+    ];
   }
 
 }
