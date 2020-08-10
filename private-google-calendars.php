@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200809
+Version: 20200810
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200809');
+define('PGC_PLUGIN_VERSION', '20200810');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -464,8 +464,7 @@ function pgc_ajax_get_calendar() {
       $optParams['timeZone'] = $_POST['timeZone'];
     }
 
-    if (!empty($_POST['isPublic'])) {
-      // Call public calendars with API key
+    if (!empty($_POST['isPublic']) && !empty(get_option('pgc_api_key'))) {
       $referer = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
       $apiKey = get_option('pgc_api_key');
       $service = new PGC_GoogleCalendarClient(null);
@@ -473,7 +472,6 @@ function pgc_ajax_get_calendar() {
         $results[$calendarId] = $service->getEventsPublic($calendarId, $optParams, $apiKey, $referer);
       }
     } else {
-      // Call private calendars with oauth token
       $client = getGoogleClient(true);
       if ($client->isAccessTokenExpired()) {
         if (!$client->getRefreshTOken()) {

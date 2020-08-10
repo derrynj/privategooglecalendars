@@ -60,6 +60,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200810 =
+* When accessing public calendars use OAUth client ID when API key is empty.
+
 = 20200809 =
 * Possible to set unchecked calendars for filter.
 
