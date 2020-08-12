@@ -153,7 +153,7 @@ function pgc_register_block() {
     'days_ago' => __('days ago', 'private-google-calendars'),
     'days_from_now' => __('days from now', 'private-google-calendars'),
     'malformed_json' => __('Malformed JSON, this calendar will probably not display correctly', 'private-google-calendars'),
-    'enter_one_or_more_public_calendar_ids' => __('Enter 1 or more public calendar IDs', 'private-google-calendars'),
+    'enter_one_or_more_public_calendar_ids' => __('Add at least one calendar!', 'private-google-calendars'),
     'malformed_json_short' => __('Malformed JSON', 'private-google-calendars'),
     'fullcalendar_config' => __('FullCalendar config', 'private-google-calendars'),
     'copy_default_fullcalendar_config' => __('Copy default FullCalendar config', 'private-google-calendars'),

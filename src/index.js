@@ -315,6 +315,8 @@ registerBlockType('pgc-plugin/calendar', {
             attrsArray.push(key + '="' + attrs[key] + '"');
         });
 
+        console.log(attrsArray.join(" "));
+
         return <p>[pgc {attrsArray.join(" ")}]</p>
     },
     deprecated: [
