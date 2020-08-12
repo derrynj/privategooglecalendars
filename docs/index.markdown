@@ -100,9 +100,79 @@ The shortcode equivalent is this:
 
 The Gutenberg block is called _Private Google Calendars_ and can be configured by an user interface and a textfield where you can specify FullCalendar configuration options, like the available views, the placement of the buttons, the locale, the timezone, etc.
 
+# Private Google Calendars settings page
+
+Explanation of configuration options on the Private Google Calendar settings page which can be found under the _Settings_ menu item.
+
+## General settings
+
+### Cache time in minutes
+
+Each time this plugin displays a Google calendar a request to Google is made. You can specify the number of minutes the Google response should be cached. This can greatly improve the performance.
+
+## Public calendar settings
+
+### API key
+
+You can enter your Google project API key in this field. Note that this _not_ officially supported by Google and the recommendation is to setup _Client-ID OAuth_ credentials instead.
+
+### Public calendars
+
+If you display public calendars that you haven't added to your Google account a default color is used and the calendar ID is used as the title. You can specify the color and title for each public calendar you are using.
+
+## Private calendar settings
+
+### Select calendars	
+
+These calendars are attached to your Google account. Select the calendars that you want to allow to be used on your site.
+
+## Tools
+
+### Update calendars
+
+This will update your calendarlist displayed under _Private calendar settings / Select calendars_. Use this if you add or remove a calendar to or from your account.
+
+### Get colorlist
+
+Download the default Google colorlist. This will be used when you have custom colors for calendar events. You only have to download this list once.
+
+### Verify
+
+Does some verification if your _Client-ID OAuth_ credential in your Google project is still OK.
+
+### Remove cache
+
+Removes the cache. Use this if you cache your events but you added new events to the calendar and want them to be displayed immediately.
+
+### Revoke access
+
+Revokes access to your Google account.
+
+### Remove plugin data
+
+Removes all plugin data. Use _Revoke access_ first before using this option. Otherwise you have to manually revoke access in the Google <a href="https://myaccount.google.com/permissions" target="_blank">Permissions</a> page.
+
 # Options for wp-config.php
 
 You can set the following options in _wp-config.php_:
 
 - `PGC_EVENTS_MAX_RESULTS` (default 250) – Maximum number of events that Google returns.
 - `PGC_EVENTS_DEFAULT_TITLE` (default "") – If the title of an event is empty, which can happen when the status is _busy_, the value of this option is displayed instead.
+
+# FAQ
+
+## W3 Total Cache
+
+If you use W3 Total Cache and have minify JS enabled, make sure that you do one of the following:
+
+Choose Combine only in the Minify settings.
+
+OR
+
+Enter the below files in the Never minify the following JS files textbox. Make sure you add the full path to these files from the root of your installation, so if your WordPress website is located in the wordpress directory, this will be:
+
+    wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/core/main.min.js
+    wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/core/locales-all.min.js
+    wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/main.min.js
+    wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js
+

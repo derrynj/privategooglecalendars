@@ -294,8 +294,7 @@ class PGC_GoogleCalendarClient {
   const GOOGLE_CALENDAR_EVENTS_URI = 'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events';
   const GOOGLE_CALENDER_PRIMARY_ID = 'primary';
   const GOOGLE_CALENDARLIST_URI = 'https://www.googleapis.com/calendar/v3/users/me/calendarList';
-  //const GOOGLE_COLORLIST_URI = 'https://www.googleapis.com/calendar/v3/colors';
-  const GOOGLE_COLORLIST_URI = 'https://content.googleapis.com/calendar/v3/colors';
+  const GOOGLE_COLORLIST_URI = 'https://www.googleapis.com/calendar/v3/colors';
 
   private $googleClient;
 

@@ -51,7 +51,6 @@ registerBlockType('pgc-plugin/calendar', {
         config: {
             type: "object",
             default: {
-                public: false,
                 filter: "top",
                 eventpopup: false,
                 eventlink: false,
@@ -101,7 +100,6 @@ registerBlockType('pgc-plugin/calendar', {
         const hideoptions = props.attributes.hideoptions;
         const fullcalendarconfig = props.attributes.fullcalendarconfig;
         const publiccalendarids = props.attributes.publiccalendarids;
-        const isPublic = props.attributes.config.public;
         const uncheckedcalendarids = props.attributes.uncheckedcalendarids;
 
         const onCalendarSelectionChange = function (newValue) {
@@ -119,10 +117,6 @@ registerBlockType('pgc-plugin/calendar', {
         const onFullCalendarConfigChange = function (newValue) {
             setHasValidFullCalendarConfigValue(hasValidFullCalendarConfigValueCheck(newValue));
             props.setAttributes({ fullcalendarconfig: newValue === "" ? "" : newValue });
-        };
-
-        const onPublicChange = function (newValue) {
-            onCalendarConfigChange.call('public', newValue);
         };
 
         const onPublicCalendarIdsChange = function (newValue) {
@@ -148,17 +142,17 @@ registerBlockType('pgc-plugin/calendar', {
         };
 
         let calendarList = null;
-        if (!isPublic) {
-            calendarList = Object.keys(window.pgc_selected_calendars).map((id) => {
-                const calendar = window.pgc_selected_calendars[id];
-                return <CheckboxControl disabled={isPublic} style={{ backgroundColor: calendar.backgroundColor }} className="pgc-sidebar-row" onChange={onCalendarSelectionChange.bind(id)}
-                    label={calendar.summary} checked={(id in calendars) && calendars[id]} />
-            });
-            if (!calendarList.length) {
-                calendarList.push(<em>No private calendars</em>);
-            }
-            calendarList.push(<HorizontalRule />);
+        
+        calendarList = Object.keys(window.pgc_selected_calendars).map((id) => {
+            const calendar = window.pgc_selected_calendars[id];
+            return <CheckboxControl style={{ backgroundColor: calendar.backgroundColor }} className="pgc-sidebar-row" onChange={onCalendarSelectionChange.bind(id)}
+                label={calendar.summary} checked={(id in calendars) && calendars[id]} />
+        });
+        if (!calendarList.length) {
+            calendarList.push(<em>No private calendars</em>);
         }
+        calendarList.push(<HorizontalRule />);
+        
 
         const eventPopupList = [
             ["eventpopup", window.pgc_trans.eventpopup],
@@ -199,7 +193,7 @@ registerBlockType('pgc-plugin/calendar', {
                             }, 0);
                             unsubscribe();
                         }
-                        if (isPublic && !publiccalendarids) {
+                        if (!selectedCalendarCount && !publiccalendarids) {
                             let t = setTimeout(function () {
                                 clearTimeout(t);
                                 wp.data.dispatch("core/notices").createWarningNotice(window.pgc_trans.enter_one_or_more_public_calendar_ids);
@@ -227,23 +221,16 @@ registerBlockType('pgc-plugin/calendar', {
             </Fragment>
         ) : null;
 
-        const publicCalendarIdsInput = isPublic ? (
-            <Fragment>
-                <TextControl label={window.pgc_trans.comma_separated_list_calendar_ids} value={publiccalendarids} onChange={onPublicCalendarIdsChange} />
-            </Fragment>
-        ) : null
-
         const infoModal = showInfoModal ? MyInfoModal({ onClose: () => { setShowInfoModal(false) } }) : null;
 
         return (
             <Fragment>
                 <InspectorControls>
                     <PanelBody
-                        title={window.pgc_trans.selected_calendars + " (" + (isPublic ? window.pgc_trans.public : (selectedCalendarCount === 0 ? window.pgc_trans.all : selectedCalendarCount)) + ")"}
+                        title={window.pgc_trans.selected_calendars + " (" + (selectedCalendarCount === 0 ? window.pgc_trans.none : selectedCalendarCount) + ")"}
                         initialOpen={true}>
                         {calendarList}
-                        <CheckboxControl className="pgc-sidebar-row" onChange={onPublicChange}
-                            label={window.pgc_trans.public_calendars} checked={isPublic} />
+                        <TextControl label={window.pgc_trans.comma_separated_list_calendar_ids} value={publiccalendarids} onChange={onPublicCalendarIdsChange} />
                     </PanelBody>
                     <PanelBody
                         title={window.pgc_trans.calendar_options}
@@ -274,7 +261,6 @@ registerBlockType('pgc-plugin/calendar', {
                 </InspectorControls>
                 <div>Private Google Calendars Block</div>
                 {fullCalendarConfigArea}
-                {publicCalendarIdsInput}
                 {infoModal}
             </Fragment>
         );
@@ -305,24 +291,21 @@ registerBlockType('pgc-plugin/calendar', {
         attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
         attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
 
-        if (props.attributes.config.public) {
+        if (props.attributes.publiccalendarids || Object.keys(props.attributes.calendars).length) {
             attrs.calendarids = props.attributes.publiccalendarids;
-        } else {
             if (Object.keys(props.attributes.calendars).length) {
                 const calendarids = [];
-                Object.keys(props.attributes.calendars).forEach(function (id) {
-                    if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
-                        calendarids.push(id);
-                    }
-                });
-                if (calendarids.length) {
-                    attrs.calendarids = calendarids.join(",");
-                }
+                    Object.keys(props.attributes.calendars).forEach(function (id) {
+                        if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
+                            calendarids.push(id);
+                        }
+                    });
+                    attrs.calendarids += (attrs.calendarids.length && calendarids.length ? "," : "") + calendarids.join(",");
             }
         }
 
         // Only if present set to save function.
-        // This means we don't have to use a deprecated version for this, because in previous versions this was is not present
+        // This means we don't have to use a deprecated version for this, because in previous versions this was not present
         // and thus not displayed in save object.
         if (props.attributes.uncheckedcalendarids) {
             attrs.uncheckedcalendarids = props.attributes.uncheckedcalendarids;
@@ -335,6 +318,105 @@ registerBlockType('pgc-plugin/calendar', {
         return <p>[pgc {attrsArray.join(" ")}]</p>
     },
     deprecated: [
+        {
+            attributes: {
+                calendars: {
+                    type: "object",
+                    default: {}
+                },
+                config: {
+                    type: "object",
+                    default: {
+                        public: false,
+                        filter: "top",
+                        eventpopup: false,
+                        eventlink: false,
+                        eventdescription: false,
+                        eventlocation: false,
+                        eventattendees: false,
+                        eventattachments: false,
+                        eventcreator: false,
+                        eventcalendarname: false
+                    }
+                },
+                fullcalendarconfig: {
+                    type: "string",
+                    default: ""
+                },
+                publiccalendarids: {
+                    type: "string",
+                    default: ""
+                },
+                uncheckedcalendarids: {
+                    type: "string",
+                    default: ""
+                },
+                hideoptions: {
+                    type: "object",
+                    default: {
+                        hidefuture: false,
+                        hidefuturedays: 0,
+                        hidepassed: false,
+                        hidepasseddays: 0,
+                    }
+                }
+            },
+            save(props) {
+                const attrs = {};
+                const attrsArray = [];
+                const config = props.attributes.config;
+                const hideoptions = props.attributes.hideoptions;
+                const fullcalendarconfig = props.attributes.fullcalendarconfig;
+                let hasValidConfig = false;
+                try {
+                    hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
+                } catch (ex) {
+                    //console.log(ex);
+                }
+                if (hasValidConfig) {
+                    attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
+                }
+                Object.keys(config).forEach(function (key) {
+                    if (key === 'filter') {
+                        attrsArray.push(key + '="' + (config[key]) + '"');
+                    } else {
+                        attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
+                    }
+                });
+        
+                attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
+                attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
+        
+                if (props.attributes.config.public) {
+                    attrs.calendarids = props.attributes.publiccalendarids;
+                } else {
+                    if (Object.keys(props.attributes.calendars).length) {
+                        const calendarids = [];
+                        Object.keys(props.attributes.calendars).forEach(function (id) {
+                            if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
+                                calendarids.push(id);
+                            }
+                        });
+                        if (calendarids.length) {
+                            attrs.calendarids = calendarids.join(",");
+                        }
+                    }
+                }
+        
+                // Only if present set to save function.
+                // This means we don't have to use a deprecated version for this, because in previous versions this was not present
+                // and thus not displayed in save object.
+                if (props.attributes.uncheckedcalendarids) {
+                    attrs.uncheckedcalendarids = props.attributes.uncheckedcalendarids;
+                }
+        
+                Object.keys(attrs).forEach(function (key) {
+                    attrsArray.push(key + '="' + attrs[key] + '"');
+                });
+        
+                return <p>[pgc {attrsArray.join(" ")}]</p>
+            }
+        },
         {
             attributes: {
                 calendars: {
