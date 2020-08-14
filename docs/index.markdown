@@ -23,9 +23,9 @@ In short these are the steps to get started:
 2. Configure a Google project in the Google API Console and download the client secret JSON file.
 3. Upload this client secret JSON file in the Private Google Calendars settings page.
 4. Select the calendars you want to allow to be used on your Wordpress site.
-5. Use the widget, shortcode and Gutenberg block to display one or more of the selected calendars on your site.
+5. Use the widget, shortcode and Gutenberg block to display one or more of the selected calendars on your site or add some public calendars.
 
-## Setting up a Google project
+## Configure a Google project
 
 1. Create a project in the <a href="https://console.developers.google.com/" target="_blank">Google API console</a>.
 2. Enable the _Google Calendar API_.
@@ -63,7 +63,8 @@ This plugin provides a widget, shortcode and a Gutenberg block. All of them have
 There are two kinds of configuration you can make:
 
 1. Plugin configuration, like which calendars you want to display, position of filter and event popup configuration.
-2. FullCalendar configuration like available views (like dayGridMonth or listWeek) and location of buttons (like next, previous, today). These configuration options are mapped directly to the FullCalendar configuration options. The advantage is that this plugin can use the FullCalendar functionality without having to know all of the configuration options beforehand. The downside is that this is somewhat more difficult to configure.
+2. FullCalendar configuration like available views (like dayGridMonth or listWeek) and location of buttons (like next, previous, today). These configuration options are mapped directly to the FullCalendar configuration options.
+For examples see the <a href="/examples">examples page</a>.
 
 ## Widget
 
@@ -77,7 +78,7 @@ The shortcode is `[pgc]` and can be configured by specifying attributes. The Ful
 
 To _translate_ FullCalendar options to shortcode attributes, follow the 2 rules:
 
-1. Nested properties like should be written with a dash “-“.
+1. Nested properties should be written with a dash “-“.
 2. The camelCase properties should be written with an underscore “_”.
 
 For example see the below FullCalendar configuration:
@@ -176,3 +177,7 @@ Enter the below files in the Never minify the following JS files textbox. Make s
     wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/main.min.js
     wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js
 
+## No refresh token error
+
+Only the first time you allow this plugin to access your Google calendars a refresh token is given to you. If you see an error like 'Your refresh token is missing!', this ususally means that you used the client secret JSON file on multiple websites.
+To fix this error, you have to go to the Google <a href="https://myaccount.google.com/permissions" target="_blank">Permissions</a> page to revoke the access to the Google calendars and remove the plugin. After that you can install the plugin and upload the client secret JSON file again.
