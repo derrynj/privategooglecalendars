@@ -212,6 +212,10 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   $uncheckedCalendarIds = ''; // in filter
   // Get all non-fullcalendar known properties
   foreach ($atts as $key => $value) {
+    if ($key === 'public') {
+      // This existsed in old versions, but we don't want it in our shortcode output, so skip it.
+      continue;
+    }
     if ($key === 'filter') {
       $userFilter = $value === 'true' ? 'top' : $value;
       continue;
@@ -1483,10 +1487,10 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $config = isset($instance['config']) ? $instance['config'] : self::$defaultConfig;
 
     // START FIX calids
-    // Fix for old users who used the thiscalendarids property (nu selection meant ALL private calendars)
+    // Fix for old users who used the thiscalendarids property (no selection meant ALL private calendars)
     // Now we do the opposite: select calendars you want to display. No calendarids selected now means NO calendars.
     $privateCalendaridsNew = null;
-    if (isset($instance['thiscalendarids'])) {
+    if (empty($publicCalendarids) && isset($instance['thiscalendarids'])) {
       $privateCalendaridsOld = $instance['thiscalendarids'];
       if (is_string($privateCalendaridsOld) && !empty($privateCalendaridsOld)) {
         $privateCalendaridsOld = json_decode($privateCalendaridsOld, true);

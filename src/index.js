@@ -275,7 +275,7 @@ registerBlockType('pgc-plugin/calendar', {
         try {
             hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
         } catch (ex) {
-            //console.log(ex);
+            
         }
         if (hasValidConfig) {
             attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
@@ -314,8 +314,6 @@ registerBlockType('pgc-plugin/calendar', {
         Object.keys(attrs).forEach(function (key) {
             attrsArray.push(key + '="' + attrs[key] + '"');
         });
-
-        console.log(attrsArray.join(" "));
 
         return <p>[pgc {attrsArray.join(" ")}]</p>
     },
@@ -373,7 +371,7 @@ registerBlockType('pgc-plugin/calendar', {
                 try {
                     hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
                 } catch (ex) {
-                    //console.log(ex);
+                    
                 }
                 if (hasValidConfig) {
                     attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
@@ -468,7 +466,7 @@ registerBlockType('pgc-plugin/calendar', {
                 try {
                     hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
                 } catch (ex) {
-                    //console.log(ex);
+                    
                 }
                 if (hasValidConfig) {
                     attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);

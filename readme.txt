@@ -60,6 +60,13 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20200811 =
+* Fixed security bug where you could display unselected private calendars
+* Now possible to use private and public calendars at the same time
+* Changed logic of displaying all or none of private calendars: before this change no selection means ALL private calendars are displyed. Now you have to select the calendars you want to display.
+This change was necessary because it's now possible to display private and public calendars at the same time.
+* These changes should not impact your current pages as long as you don't edit them. If you experience changed behaviour of existing pages, please make sure to clear all caches.
+
 = 20200810 =
 * When accessing public calendars use OAUth client ID when API key is empty.
 
