@@ -181,3 +181,7 @@ Enter the below files in the Never minify the following JS files textbox. Make s
 
 Only the first time you allow this plugin to access your Google calendars a refresh token is given to you. If you see an error like 'Your refresh token is missing!', this ususally means that you used the client secret JSON file on multiple websites.
 To fix this error, you have to go to the Google <a href="https://myaccount.google.com/permissions" target="_blank">Permissions</a> page to revoke the access to the Google calendars and remove the plugin. After that you can install the plugin and upload the client secret JSON file again.
+
+## Rate limit exceeded error
+
+This usually means you have a wrong API key.

@@ -420,10 +420,9 @@
     window.fullCalendars.push(fullCalendar);
   });
 
-  tippy.delegate("body", {
+  var tippyArg = {
     target: "*[data-tippy-content]",
     allowHTML: true,
-    trigger: "click",
     theme: "pgc",
     interactive: true,
     appendTo: document.body,
@@ -436,7 +435,13 @@
         }
       });
     }
-  });
+  };
+
+  if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    tippyArg.trigger = "click";
+  }
+
+  tippy.delegate("body", tippyArg);
 
   var startClientX = 0;
   var startClientY = 0;

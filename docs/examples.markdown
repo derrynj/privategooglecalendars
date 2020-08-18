@@ -118,16 +118,6 @@ Or tomorrow:
 
 And so on.
 
-## Control width and height of event popup
-
-By default the popup will be as heigh as the content. This can cause the popup to be off the screen. You can control the height and width of the popup with the following CSS:
-
-    .tippy-box {
-        max-height:200px;
-        overflow-y: auto;
-        max-width: 500px !important;
-    }
-
 ## Format dates
 
 You can format the following properties: `columnHeaderFormat` (default day names displayed for month and week views), `eventTimeFormat` (date displayed in the events) and `titleFormat` (title displayed in the header).
@@ -146,7 +136,38 @@ If you use the widget or Gutenberg block, you add this to the _FullCalendar conf
 
 By default all calendars you want to show are checked in the filter. If you want some or no calendars to be checked by default, you can add them to the _Unchecked calendar IDs_ option. Just enter the calendar IDs separated by a comma. The calendar ID is displayed in the Private Google Calendars settings page (just beneath the calendar title) if you use private calendars. If you display public calendars, you already know the calendar ID.
 
+In the shortcode you use:
+
+    [pgc uncheckedcalendarids="calendar1,calendar2"]
+
 ## Custom colors for events
 
-In the Google calendar it’s possible to specify custom colors for events. By default all events have the same color as the calendar they’re in. If you specify custom colors for events, this plugin will display them by first you have to download the Google colors. This can be done by clicking the Update colorlist button in the settings page. This will download the Google colors so this plugin knows what colors to use. You only have to do this one.
+In the Google calendar it’s possible to specify custom colors for events. By default all events have the same color as the calendar they’re in. If you specify custom colors for events, this plugin will display them but first you have to download the Google colors. This can be done by clicking the _Update colorlist_ button in the settings page. This will download the Google colors so this plugin knows what colors to use. You only have to do this one.
+
+## Show weeknumbers
+
+For shortcode:
+
+    [pgc week_numbers="true"]
+
+If you use the widget or Gutenberg block, you add this to the _FullCalendar config_ textfield:
+
+    {
+        "weekNumbers": true
+    }
+
+## Specify the valid period range for events
+
+If you want to restrict the period range, you can do:
+
+    [pgc valid_range-start="2020-08-01" valid_range-end="2020-08-31"]
+
+If you use the widget or Gutenberg block, you add this to the _FullCalendar config_ textfield:
+
+    {
+        "validRange": {
+            "start": "2020-08-01",
+            "end": "2020-08-31"
+        }
+    }
 
