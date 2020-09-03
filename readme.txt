@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.5
+Tested up to: 5.5.1
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -12,9 +12,16 @@ Display multiple private and public Google Calendars
 
 == Description ==
 
+__Important notes for users who upgraded to 20200902 and experience differences__
+The 20200902 update makes it possible to display private and public Google calendars at the same time in the same widget, shortcode or Gutenberg block.
+This update makes the plugin also more secure. Though tested thoroughly it can be possible you experience a difference. Here are some possible differences and ways to solve them.
+
+* Public calendar isn't showing anymore: this can happen when you display a calendar that you also have added to your Google account but didn't select in the plugin settings page.
+The solution is either remove the calendar from your Google account or select it in the settings.
+
 This plugin can display multiple private (and public) Google calendars with a shortcode, Gutenberg block or as a widget.
 
-See the [webpage]https://blog.michielvaneerd.nl/private-google-calendars for more information.
+See the [webpage]https://michielvaneerd.github.io/privategooglecalendars/ for information.
 
 = Features =
 
@@ -60,12 +67,13 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
-= 20200811 =
+= 20200902 =
 * Fixed security bug where you could display unselected private calendars
 * Now possible to use private and public calendars at the same time
 * Changed logic of displaying all or none of private calendars: before this change no selection means ALL private calendars are displyed. Now you have to select the calendars you want to display.
 This change was necessary because it's now possible to display private and public calendars at the same time.
 * These changes should not impact your current pages as long as you don't edit them. If you experience changed behaviour of existing pages, please make sure to clear all caches.
+* Added new documentation at: https://michielvaneerd.github.io/privategooglecalendars/
 
 = 20200810 =
 * When accessing public calendars use OAUth client ID when API key is empty.
