@@ -12,16 +12,9 @@ Display multiple private and public Google Calendars
 
 == Description ==
 
-__Important notes for users who upgraded to 20200902 and experience differences__
-The 20200902 update makes it possible to display private and public Google calendars at the same time in the same widget, shortcode or Gutenberg block.
-This update makes the plugin also more secure. Though tested thoroughly it can be possible you experience a difference. Here are some possible differences and ways to solve them.
-
-* Public calendar isn't showing anymore: this can happen when you display a calendar that you also have added to your Google account but didn't select in the plugin settings page.
-The solution is either remove the calendar from your Google account or select it in the settings.
-
 This plugin can display multiple private (and public) Google calendars with a shortcode, Gutenberg block or as a widget.
 
-See the [webpage]https://michielvaneerd.github.io/privategooglecalendars/ for information.
+See the [webpage](https://michielvaneerd.github.io/privategooglecalendars/) for more information.
 
 = Features =
 
@@ -38,6 +31,14 @@ See the [webpage]https://michielvaneerd.github.io/privategooglecalendars/ for in
 4. See the Help tab in the settings screen for information about setting up the OAuth2 access and using the shortcode and/or widget.
 
 == Frequently Asked Questions ==
+
+= Important notes for users who upgraded to 20200902 and experience differences =
+
+The 20200902 update makes it possible to display private and public Google calendars at the same time in the same widget, shortcode or Gutenberg block.
+This update makes the plugin also more secure. Though tested thoroughly it can be possible you experience a difference. Here are some possible differences and ways to solve them.
+
+* Public calendar isn't showing anymore: this can happen when you display a calendar that you also have added to your Google account but didn't select in the plugin settings page.
+The solution is either remove the calendar from your Google account or select it in the settings.
 
 = How can I override the calendar look? =
 
