@@ -5,8 +5,6 @@
 layout: home
 ---
 
-Private Google Calendars is a <a href="https://wordpress.org/plugins/private-google-calendars/" target="_blank">Wordpress plugin</a> that displays public and private Google calendars. You can see it in action on <a href="https://blog.michielvaneerd.nl/private-google-calendars/" target="_blank">my site</a>. For examples see the <a href="/examples">examples page</a>.
-
 Functionality:
 
 - Display multiple public and private Google calendars.
