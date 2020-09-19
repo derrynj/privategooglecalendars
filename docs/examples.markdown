@@ -43,7 +43,7 @@ If you use the widget or Gutenberg block, you add this to the _FullCalendar conf
             "center": "title",
             "right": "dayGridMonth,listWeek"
         },
-        defaultView: "listWeek"
+        "defaultView": "listWeek"
     }
 
 ## Configure the event popup
