@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20200902
+Version: 20201204
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20200902');
+define('PGC_PLUGIN_VERSION', '20201204');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -63,7 +63,9 @@ function pgc_init() {
 
   load_plugin_textdomain('private-google-calendars', FALSE, basename(dirname(__FILE__)) . '/languages/');
 
-  initTranslatedDefines();
+  if (!defined('PGC_PLUGIN_NAME')) {
+    initTranslatedDefines();
+  }
 
   add_shortcode('pgc', 'pgc_shortcode');
   if (function_exists('register_block_type')) {
@@ -697,9 +699,11 @@ function pgc_show_tools() {
   $accessToken = getDecoded('pgc_access_token');
   $refreshToken = get_option('pgc_refresh_token');
 
+  ?><hr><h1><?php _e('Tools'); ?></h1><?php
+
   if (empty($clientSecretError) && !empty($accessToken) && !empty($refreshToken)) {
 
-    ?><hr><h1><?php _e('Tools'); ?></h1><?php
+    
   
   ?>
 
@@ -750,17 +754,15 @@ function pgc_show_tools() {
   <input type="hidden" name="action" value="pgc_revoke">
   <?php submit_button(__('Revoke access', 'private-google-calendars'), 'small', 'submit-revoke', false); ?>
 </form>
-
-<h2><?php _e('Remove plugin data', 'private-google-calendars'); ?></h2>
+    
+  <?php } ?>
+    
+  <h2><?php _e('Remove plugin data', 'private-google-calendars'); ?></h2>
 <p><?php printf(__('Removes all saved plugin data.<br>If you have authorized this plugin access to your calendars, manually revoke access on the Google <a href="%s" target="__blank">Permissions</a> page.', 'private-google-calendars'), 'https://myaccount.google.com/permissions'); ?></p>
 <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
   <input type="hidden" name="action" value="pgc_remove">
   <?php submit_button(__('Remove plugin data', 'private-google-calendars'), 'small', 'submit-remove', false); ?>
 </form>
-    
-  <?php } ?>
-    
-
       
   
 
