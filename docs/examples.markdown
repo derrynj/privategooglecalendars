@@ -6,6 +6,8 @@ permalink: /examples/
 
 The Private Google Calendars plugin provides a widget, shortcode and Gutenberg block. Each one has the same functionality but has to be configured differently. The configurations of the widget and Gutenberg block are almost the same as this can be done with a user interface and speaks mostly for itself. The shortcode configuration differs a lot because it has to be specified as attributes of the shortcode.
 
+Many of the below examples are really FullCalendar options. Currently this plugin uses the v4 version of FullCalendar. If you can't find your answer here, you can have a look at https://fullcalendar.io/docs/v4#toc or send a message to the forum at https://wordpress.org/support/plugin/private-google-calendars/.
+
 ## Show all private calendars
 
 Simply using `[pgc]` will display all of the private calendars you've selected in the settings page.
@@ -132,6 +134,44 @@ If you use the widget or Gutenberg block, you add this to the _FullCalendar conf
         "eventTimeFormat": "Do MMM"
     }
 
+## Format date on titlebar
+
+See https://fullcalendar.io/docs/v4/titleFormat.
+
+For example if you want to display only the title as Tuesday, 12th November:
+
+If you use the widget or Gutenberg block, you add this to the _FullCalendar config_ textfield:
+
+    {
+        "header": {
+            "left": "title",
+            "center": "",
+            "right": ""
+        },
+        "titleFormat": "D MMMM YYYY dddd"
+    }
+
+Shortcode:
+
+    [pgc header-left="title" header-center="" header-right="" title_format="D MMMM YYYY dddd"]
+
+Instead of explicitly specifying the date format `D MMMM YYYY dddd` you can also use localized versions, for example: `LL`.
+
+## Format date in weeklist
+
+See https://fullcalendar.io/docs/v4/listDayFormat and https://fullcalendar.io/docs/v4/listDayAltFormat.
+
+If you use the widget or Gutenberg block, you add this to the _FullCalendar config_ textfield:
+
+    {
+        "listDayAltFormat": false,
+        "list_day_format": "D MMMM YYYY dddd"
+    }
+
+Shortcode:
+
+    [pgc list_day_alt_format="false" list_day_format="D MMMM YYYY dddd"]
+
 ## Uncheck calendars in filter
 
 By default all calendars you want to show are checked in the filter. If you want some or no calendars to be checked by default, you can add them to the _Unchecked calendar IDs_ option. Just enter the calendar IDs separated by a comma. The calendar ID is displayed in the Private Google Calendars settings page (just beneath the calendar title) if you use private calendars. If you display public calendars, you already know the calendar ID.
@@ -171,3 +211,10 @@ If you use the widget or Gutenberg block, you add this to the _FullCalendar conf
         }
     }
 
+## Hide filter or change position
+
+For shortcode:
+
+    [pgc filter="false"]
+
+If you use the Gutenberg block or widget you can select the preferred option.

@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.5.1
+Tested up to: 5.5.3
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -67,6 +67,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/mai
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
 
 == Changelog ==
+
+= 20201204 =
+* Conditionally load defines to prevent logs.
+* Always show the "Remove plugin data" option, to prevent a lockin where you have no valid token anymore, but you can't delete your plugin data.
 
 = 20200902 =
 * Fixed security bug where you could display unselected private calendars
