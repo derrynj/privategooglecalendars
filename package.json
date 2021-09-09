@@ -22,6 +22,6 @@
   },
   "homepage": "https://github.com/michielvaneerd/privategooglecalendars#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^9.1.0"
+    "@wordpress/scripts": "^18.0.1"
   }
 }
