@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20210909
+Version: 20211030
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20210909');
+define('PGC_PLUGIN_VERSION', '20211030');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -359,16 +359,16 @@ add_action('wp_enqueue_scripts', 'pgc_enqueue_scripts', PGC_ENQUEUE_ACTION_PRIOR
 // make sure we load last after theme files so we can override.
 function pgc_enqueue_scripts() {
   wp_enqueue_style('dashicons');
-  wp_enqueue_style('fullcalendar',
+  wp_enqueue_style('pgc_fullcalendar',
       plugin_dir_url(__FILE__) . 'lib/fullcalendar4/core/main.min.css', null, PGC_PLUGIN_VERSION);
-  wp_enqueue_style('fullcalendar_daygrid',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/daygrid/main.min.css', ['fullcalendar'], PGC_PLUGIN_VERSION);
-  wp_enqueue_style('fullcalendar_timegrid',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/timegrid/main.min.css', ['fullcalendar_daygrid'], PGC_PLUGIN_VERSION);
-  wp_enqueue_style('fullcalendar_list',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/list/main.min.css', ['fullcalendar'], PGC_PLUGIN_VERSION);
+  wp_enqueue_style('pgc_fullcalendar_daygrid',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/daygrid/main.min.css', ['pgc_fullcalendar'], PGC_PLUGIN_VERSION);
+  wp_enqueue_style('pgc_fullcalendar_timegrid',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/timegrid/main.min.css', ['pgc_fullcalendar_daygrid'], PGC_PLUGIN_VERSION);
+  wp_enqueue_style('pgc_fullcalendar_list',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/list/main.min.css', ['pgc_fullcalendar'], PGC_PLUGIN_VERSION);
   wp_enqueue_style('pgc',
-      plugin_dir_url(__FILE__) . 'css/pgc.css', ['fullcalendar_timegrid'], PGC_PLUGIN_VERSION);
+      plugin_dir_url(__FILE__) . 'css/pgc.css', ['pgc_fullcalendar_timegrid'], PGC_PLUGIN_VERSION);
   wp_enqueue_style('tippy_light',
       plugin_dir_url(__FILE__) . 'lib/tippy/light-border.css', null, PGC_PLUGIN_VERSION);
   wp_enqueue_script('popper',
@@ -379,23 +379,23 @@ function pgc_enqueue_scripts() {
       plugin_dir_url(__FILE__) . 'lib/moment/moment-with-locales.min.js', null, PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('my_moment_timezone',
       plugin_dir_url(__FILE__) . 'lib/moment/moment-timezone-with-data.min.js', ['my_moment'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar',
+  wp_enqueue_script('pgc_fullcalendar',
       plugin_dir_url(__FILE__) . 'lib/fullcalendar4/core/main.min.js', ['my_moment_timezone'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar_moment',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/moment/main.min.js', ['fullcalendar'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar_moment_timezone',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/moment-timezone/main.min.js', ['fullcalendar_moment'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar_daygrid',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/daygrid/main.min.js', ['fullcalendar'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar_timegrid',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/timegrid/main.min.js', ['fullcalendar_daygrid'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar_list',
-      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/list/main.min.js', ['fullcalendar'], PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('fullcalendar_locales',
+  wp_enqueue_script('pgc_fullcalendar_moment',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/moment/main.min.js', ['pgc_fullcalendar'], PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('pgc_fullcalendar_moment_timezone',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/moment-timezone/main.min.js', ['pgc_fullcalendar_moment'], PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('pgc_fullcalendar_daygrid',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/daygrid/main.min.js', ['pgc_fullcalendar'], PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('pgc_fullcalendar_timegrid',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/timegrid/main.min.js', ['pgc_fullcalendar_daygrid'], PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('pgc_fullcalendar_list',
+      plugin_dir_url(__FILE__) . 'lib/fullcalendar4/list/main.min.js', ['pgc_fullcalendar'], PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('pgc_fullcalendar_locales',
       plugin_dir_url(__FILE__) . 'lib/fullcalendar4/core/locales-all.min.js',
-      ['fullcalendar'], PGC_PLUGIN_VERSION, true);
+      ['pgc_fullcalendar'], PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('pgc', plugin_dir_url(__FILE__) . 'js/pgc.js',
-      ['fullcalendar'], PGC_PLUGIN_VERSION, true);
+      ['pgc_fullcalendar'], PGC_PLUGIN_VERSION, true);
   $nonce = wp_create_nonce('pgc_nonce');
   wp_localize_script('pgc', 'pgc_object', [
     'ajax_url' => admin_url('admin-ajax.php'),

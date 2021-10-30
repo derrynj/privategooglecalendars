@@ -68,6 +68,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20211030 =
+* Renamed enqueue name for FullCalendar to prevent clashes with other themes or plugins that are loading different versions of fullcalendar.
+
 = 20201204 =
 * Conditionally load defines to prevent logs.
 * Always show the "Remove plugin data" option, to prevent a lockin where you have no valid token anymore, but you can't delete your plugin data.
