@@ -191,6 +191,7 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   // We accept nested attributes like this:
   // [pgc header-left="today" header-center="title"] which becomes:
   // ['header' => ['left' => 'today', 'center' => 'title']]
+  // 'header' is called in FC5 'headerToolbar' (and 'footer' to 'footerToolbar')
   $defaultConfig = [
     'header' => [
       'left' => 'prev,next today',
@@ -358,7 +359,40 @@ function pgc_admin_enqueue_scripts($hook) {
 add_action('wp_enqueue_scripts', 'pgc_enqueue_scripts', PGC_ENQUEUE_ACTION_PRIORITY);
 // make sure we load last after theme files so we can override.
 function pgc_enqueue_scripts() {
+
   wp_enqueue_style('dashicons');
+  wp_enqueue_style('tippy_light',
+      plugin_dir_url(__FILE__) . 'lib/tippy/light-border.css', null, PGC_PLUGIN_VERSION);
+  wp_enqueue_script('popper',
+      plugin_dir_url(__FILE__) . 'lib/popper.min.js', null, PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('tippy',
+      plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.umd.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
+
+  $fullcalendarVersion = get_option('pgc_fullcalendar_version');
+  
+  if ($fullcalendarVersion == 5) {
+    // Load new FullCalendar 5 files
+    wp_enqueue_style('pgc_main',
+      plugin_dir_url(__FILE__) . 'lib/dist/main.css', null, PGC_PLUGIN_VERSION);
+    wp_enqueue_script('pgc_main',
+      plugin_dir_url(__FILE__) . 'lib/dist/main.js', null, PGC_PLUGIN_VERSION, true);
+    $nonce = wp_create_nonce('pgc_nonce');
+    wp_localize_script('pgc_main', 'pgc_object', [
+      'ajax_url' => admin_url('admin-ajax.php'),
+      'nonce' => $nonce,
+      'trans' => [
+        'all_day' => __('All day', 'private-google-calendars'),
+        'created_by' => __('Created by', 'private-google-calendars'),
+        'go_to_event' => __('Go to event', 'private-google-calendars'),
+        'unknown_error' => __('Unknown error', 'private-google-calendars'),
+        'request_error' => __('Request error', 'private-google-calendars'),
+        'loading' => __('Loading', 'private-google-calendars')
+      ]
+    ]);
+    return;
+  }
+
+  // Old FullCalendar (4)
   wp_enqueue_style('pgc_fullcalendar',
       plugin_dir_url(__FILE__) . 'lib/fullcalendar4/core/main.min.css', null, PGC_PLUGIN_VERSION);
   wp_enqueue_style('pgc_fullcalendar_daygrid',
@@ -369,12 +403,6 @@ function pgc_enqueue_scripts() {
       plugin_dir_url(__FILE__) . 'lib/fullcalendar4/list/main.min.css', ['pgc_fullcalendar'], PGC_PLUGIN_VERSION);
   wp_enqueue_style('pgc',
       plugin_dir_url(__FILE__) . 'css/pgc.css', ['pgc_fullcalendar_timegrid'], PGC_PLUGIN_VERSION);
-  wp_enqueue_style('tippy_light',
-      plugin_dir_url(__FILE__) . 'lib/tippy/light-border.css', null, PGC_PLUGIN_VERSION);
-  wp_enqueue_script('popper',
-      plugin_dir_url(__FILE__) . 'lib/popper.min.js', null, PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('tippy',
-      plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.umd.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('my_moment',
       plugin_dir_url(__FILE__) . 'lib/moment/moment-with-locales.min.js', null, PGC_PLUGIN_VERSION, true);
   wp_enqueue_script('my_moment_timezone',
@@ -561,12 +589,14 @@ function pgc_ajax_get_calendar() {
     wp_die();
   } catch (PGC_GoogleClient_RequestException $ex) {
     wp_send_json([
+      'stack' => $ex->getTraceAsString(),
       'error' => $ex->getMessage(),
       'errorCode' => $ex->getCode(),
       'errorDescription' => $ex->getDescription()]);
     wp_die();
   } catch (Exception $ex) {
     wp_send_json([
+      'stack' => $ex->getTraceAsString(),
       'error' => $ex->getMessage(),
       'errorCode' => $ex->getCode()]);
     wp_die();
@@ -1088,6 +1118,9 @@ function pgc_settings_init() {
     register_setting('pgc', 'pgc_cache_time', [
       'show_in_rest' => false
     ]);
+    register_setting('pgc', 'pgc_fullcalendar_version', [
+      'show_in_rest' => false
+    ]);
     // Added in settings: id / name / backgroundcolor / color
     register_setting('pgc', 'pgc_public_calendarlist', [
       'show_in_rest' => false
@@ -1153,6 +1186,22 @@ function pgc_settings_init() {
     },
     'pgc',
     'pgc_settings_section_always');
+
+  add_settings_field(
+    'pgc_settings_fullcalendar_version',
+    __('FullCalendar version', 'private-google-calendars'),
+    function() {
+      $version = get_option('pgc_fullcalendar_version');
+      ?>
+        <select name="pgc_fullcalendar_version" id="pgc_fullcalendar_version">
+          <option value="4" <?php selected($version, '4', true); ?>>4</option>
+          <option value="5" <?php selected($version, '5', true); ?>>5</option>
+        </select>
+      <?php
+    },
+    'pgc',
+    'pgc_settings_section_always'
+  );
 
   if (empty($clientSecret) || !empty($clientSecretError)) {
     // Make the options we use with register_settings not autoloaded.
@@ -1440,6 +1489,7 @@ function pgc_show_notice($notice, $type, $dismissable) {
 class Pgc_Calendar_Widget extends WP_Widget {
 
   private static $defaultConfig = [
+    // 'header' is called in FC5 'headerToolbar' (and 'footer' to 'footerToolbar')
     'header' => [
       'left' => 'title',
       'center' => '',
