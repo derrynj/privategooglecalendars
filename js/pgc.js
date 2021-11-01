@@ -1,4 +1,4 @@
-(function(win) {
+(function (win) {
 
   window.fullCalendars = [];
 
@@ -42,7 +42,7 @@
   }
 
   function castObjectAttributes(obj) {
-    Object.keys(obj).forEach(function(key) {
+    Object.keys(obj).forEach(function (key) {
       if (obj[key]) {
         switch (typeof obj[key]) {
           case 'string':
@@ -58,8 +58,8 @@
     });
   }
 
-  
-  Array.prototype.forEach.call(document.querySelectorAll(".pgc-calendar-wrapper"), function(calendarWrapper, calendarCounter) {
+
+  Array.prototype.forEach.call(document.querySelectorAll(".pgc-calendar-wrapper"), function (calendarWrapper, calendarCounter) {
 
     var errorEl = window.document.createElement("div");
     errorEl.className = "pgc-error-el";
@@ -107,12 +107,12 @@
       eventLimit: true
     };
     var dataConfig = $calendar.getAttribute("data-config") ? JSON.parse($calendar.getAttribute("data-config")) : {};
-    
+
     // Cast booleans and int (we also get these as strings)
     castObjectAttributes(dataConfig);
 
     var config = Object.assign({}, defaultConfig);
-    Object.keys(dataConfig).forEach(function(key) {
+    Object.keys(dataConfig).forEach(function (key) {
       var value = castAttrValue(dataConfig[key]);
       config[underscoreToUpper(key)] = value;
     });
@@ -132,7 +132,7 @@
     // Only in shortcode
     // TODO: with new release this can be deleted I think.
     if ("calendarids" in config) {
-      thisCalendarids = config.calendarids.split(",").map(function(item) {
+      thisCalendarids = config.calendarids.split(",").map(function (item) {
         return item.replace(" ", "");
       });
     }
@@ -159,7 +159,7 @@
         loadingEl.parentNode.removeChild(loadingEl);
       }
     }
-  
+
     function setError(msg) {
       clearLoading();
       if (makeSureErrorAndLoadingParentExists()) {
@@ -167,7 +167,7 @@
         errorAndLoadingParent.appendChild(errorEl);
       }
     }
-  
+
     function setLoading(msg) {
       clearError();
       if (makeSureErrorAndLoadingParentExists()) {
@@ -179,27 +179,32 @@
     function handleCalendarFilter(calendars) {
 
       allCalendars = calendars;
-      
+
       // Make sure below happens once.
       if (selectedCalIds !== null) {
         return;
       }
-      
+
       selectedCalIds = Object.keys(calendars); // default all calendars selected
       if (uncheckedCalendarIds.length) {
         var tmp = [];
-        selectedCalIds.forEach(function(key) {
+        selectedCalIds.forEach(function (key) {
           if (uncheckedCalendarIds.indexOf(key) === -1) {
             tmp.push(key);
           }
         });
         selectedCalIds = tmp;
       }
-      
+
       if (!filter) return;
-      
+
       var selectBoxes = [];
-      Object.keys(calendars).forEach(function(key, index) {
+      // Sort calendars by summary
+      var sortedCalendarIds = Object.keys(calendars);
+      sortedCalendarIds.sort(function (a, b) {
+        return calendars[b].summary.localeCompare(calendars[b].summary);
+      });
+      sortedCalendarIds.forEach(function (key, index) {
         if (thisCalendarids.length && thisCalendarids.indexOf(key) === -1) {
           return;
         }
@@ -213,7 +218,7 @@
 
     function getFilteredEvents() {
       var newEvents = [];
-      currentAllEvents.forEach(function(item) {
+      currentAllEvents.forEach(function (item) {
         if (selectedCalIds.indexOf(item.calId) > -1) {
           newEvents.push(item);
         }
@@ -224,21 +229,21 @@
     function setEvents() {
       var newEvents = getFilteredEvents();
       var calendarEvents = fullCalendar.getEvents();
-      fullCalendar.batchRendering(function() {
-        calendarEvents.forEach(function(e) {
+      fullCalendar.batchRendering(function () {
+        calendarEvents.forEach(function (e) {
           e.remove();
         });
       });
-      fullCalendar.batchRendering(function() {
-        newEvents.forEach(function(e) {
+      fullCalendar.batchRendering(function () {
+        newEvents.forEach(function (e) {
           fullCalendar.addEvent(e);
         });
       });
     }
 
     if ($calendarFilter) {
-      $calendarFilter.addEventListener("change", function(e) {
-        selectedCalIds = Array.prototype.map.call(calendarWrapper.querySelectorAll(".pgc-calendar-filter-wrapper input[type='checkbox']:checked"), function(item) {
+      $calendarFilter.addEventListener("change", function (e) {
+        selectedCalIds = Array.prototype.map.call(calendarWrapper.querySelectorAll(".pgc-calendar-filter-wrapper input[type='checkbox']:checked"), function (item) {
           return item.value;
         });
         setEvents();
@@ -249,9 +254,9 @@
 
     // Add things no one can override.
     config = Object.assign(config, {
-      loading: function(isLoading, view) {
+      loading: function (isLoading, view) {
         if (isLoading) {
-          loadingTimer = setTimeout(function() {
+          loadingTimer = setTimeout(function () {
             setLoading(pgc_object.trans.loading);
           }, 300);
         } else {
@@ -262,7 +267,7 @@
           clearLoading();
         }
       },
-      eventRender: function(info) {
+      eventRender: function (info) {
 
         if (showEventPopup) {
           var texts = ['<span class="pgc-popup-draghandle dashicons dashicons-screenoptions"></span><div class="pgc-popup-row pgc-event-title"><div class="pgc-popup-row-icon"><span></span></div><div class="pgc-popup-row-value">' + info.event.title + '</div></div>'];
@@ -288,18 +293,18 @@
             }
           }
           if (showEventDescription && info.event.extendedProps.description) {
-           texts.push('<div class="pgc-popup-row pgc-event-description"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-editor-alignleft"></span></div><div class="pgc-popup-row-value">' + info.event.extendedProps.description + '</div></div>');
+            texts.push('<div class="pgc-popup-row pgc-event-description"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-editor-alignleft"></span></div><div class="pgc-popup-row-value">' + info.event.extendedProps.description + '</div></div>');
           }
           if (showEventLocation && info.event.extendedProps.location) {
             texts.push('<div class="pgc-popup-row pgc-event-location"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-location"></span></div><div class="pgc-popup-row-value">' + info.event.extendedProps.location + '</div></div>');
           }
           if (showEventAttendees && info.event.extendedProps.attendees && info.event.extendedProps.attendees.length) {
-            texts.push('<div class="pgc-popup-row pgc-event-attendees"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-groups"></span></div><div class="pgc-popup-row-value"><ul>' + info.event.extendedProps.attendees.map(function(attendee) {
+            texts.push('<div class="pgc-popup-row pgc-event-attendees"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-groups"></span></div><div class="pgc-popup-row-value"><ul>' + info.event.extendedProps.attendees.map(function (attendee) {
               return '<li>' + attendee.email + '</li>';
             }).join('') + '</ul></div></div>');
           }
           if (showEventAttachments && info.event.extendedProps.attachments && info.event.extendedProps.attachments.length) {
-            texts.push('<div class="pgc-popup-row pgc-event-attachments"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-paperclip"></span></div><div class="pgc-popup-row-value"><ul>' + info.event.extendedProps.attachments.map(function(attachment) {
+            texts.push('<div class="pgc-popup-row pgc-event-attachments"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-paperclip"></span></div><div class="pgc-popup-row-value"><ul>' + info.event.extendedProps.attachments.map(function (attachment) {
               return '<li><a rel="noopener noreferrer" target="_blank" href="' + attachment.fileUrl + '">' + attachment.title + '</a></li>';
             }).join('<br>') + '</ul></div></div>');
           }
@@ -320,17 +325,20 @@
           if (showEventLink) {
             texts.push('<div class="pgc-popup-row pgc-event-link"><div class="pgc-popup-row-icon"><span class="dashicons dashicons-external"></span></div><div class="pgc-popup-row-value"><a rel="noopener noreferrer" target="_blank" href="' + info.event.extendedProps.htmlLink + '">' + pgc_object.trans.go_to_event + '</a></div></div>');
           }
-          info.el.setAttribute("data-tippy-content",  texts.join("\n"));
+          info.el.setAttribute("data-tippy-content", texts.join("\n"));
           info.el.setAttribute("data-calendarid", info.event.extendedProps.calId);
         }
       },
-      events: function(arg, successCcallback, failureCallback) {
+      events: function (arg, successCcallback, failureCallback) {
         var start = arg.start;
         var end = arg.end;
-        //var fStart = dateFormat(start);
         var fStart = arg.startStr;
-        //var fEnd = dateFormat(end);
         var fEnd = arg.endStr;
+        // Make sure we always have a timezone offset because this is what Google expects.
+        if (fStart.indexOf('+') === -1) {
+          fStart += '+00:00';
+          fEnd += '+00:00';
+        }
 
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
@@ -345,7 +353,7 @@
         if (isPublic) {
           formData.append("isPublic", 1);
         }
-        xhr.onload = function(eLoad) {
+        xhr.onload = function (eLoad) {
           try {
             var response = JSON.parse(this.response);
             if ("error" in response) {
@@ -355,7 +363,7 @@
             if ("items" in response) {
               // Merge calendar backgroundcolor and items
               var calendars = response.calendars;
-              response.items.forEach(function(item) {
+              response.items.forEach(function (item) {
                 // Check if we have this calendar - if we get cached items, but someone unselected
                 // a calendar in the admin, we can get items for unselected calendars.
                 if (!(item.calId in calendars)) return;
@@ -380,7 +388,7 @@
             xhr = null;
           }
         };
-        xhr.onerror = function(eError) {
+        xhr.onerror = function (eError) {
           setError(eError.error || pgc_object.trans.request_error);
           console.error(eError);
           successCcallback([]);
@@ -427,8 +435,8 @@
     interactive: true,
     appendTo: document.body,
     theme: 'light-border',
-    onMount: function(instance) {
-      Array.prototype.forEach.call(instance.popper.querySelectorAll("a"), function(a) {
+    onMount: function (instance) {
+      Array.prototype.forEach.call(instance.popper.querySelectorAll("a"), function (a) {
         if (!a.getAttribute("target")) {
           a.setAttribute("target", "_blank");
           a.setAttribute("rel", "noopener noreferrer");
@@ -450,9 +458,9 @@
   var popupElementStartY = 0;
 
   function onBodyMouseDown(e) {
-    
+
     var el = e.target || e.srcElement;
-    
+
     if (!el.classList.contains('pgc-popup-draghandle')) return;
 
     while (el) {
@@ -479,7 +487,7 @@
 
   function onBodyMouseUp() {
     document.body.removeEventListener("mousemove", onBodyMouseMove);
-    document.body.removeEventListener("mouseup", onBodyMouseUp);  
+    document.body.removeEventListener("mouseup", onBodyMouseUp);
   }
 
   document.body.addEventListener("mousedown", onBodyMouseDown);

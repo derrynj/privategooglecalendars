@@ -68,6 +68,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20211101 =
+* Sort calendars in the filter alphabetically.
+* Enqueue FullCalendar with a prefixed name to make sure the files are loaded.
+
 = 20211030 =
 * Renamed enqueue name for FullCalendar to prevent clashes with other themes or plugins that are loading different versions of fullcalendar.
 
