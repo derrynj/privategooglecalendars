@@ -202,7 +202,7 @@
       // Sort calendars by summary
       var sortedCalendarIds = Object.keys(calendars);
       sortedCalendarIds.sort(function (a, b) {
-        return calendars[b].summary.localeCompare(calendars[b].summary);
+        return calendars[a].summary.localeCompare(calendars[b].summary);
       });
       sortedCalendarIds.forEach(function (key, index) {
         if (thisCalendarids.length && thisCalendarids.indexOf(key) === -1) {
@@ -334,11 +334,15 @@
         var end = arg.end;
         var fStart = arg.startStr;
         var fEnd = arg.endStr;
+        // if (/[\+\-]\d{2}:\d{2}$/.test(fStart)) {
+
+        // }
         // Make sure we always have a timezone offset because this is what Google expects.
-        if (fStart.indexOf('+') === -1) {
-          fStart += '+00:00';
-          fEnd += '+00:00';
-        }
+        // PAS OP: fStart kan ook zijn: 2021-11-01T00:00:00-04:00 (dus met een - ipv een +)!
+        // if (fStart.indexOf('+') === -1 && fStart.indexOf('-') === -1) {
+        //   fStart += '+00:00';
+        //   fEnd += '+00:00';
+        // }
 
         var xhr = new XMLHttpRequest();
         var formData = new FormData();
