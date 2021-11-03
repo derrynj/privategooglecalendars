@@ -39,14 +39,6 @@
     "@fullcalendar/common" "~5.10.0"
     tslib "^2.1.0"
 
-"@fullcalendar/luxon@^5.10.0":
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/@fullcalendar/luxon/-/luxon-5.10.0.tgz#452df2f37e587bca9ed86428642b153942d7b4b8"
-  integrity sha512-gz0NYrs2scX4vPPAfK5X9EupVLH08bFsPVfoM0jEahgjLnK8nqKIyYvUui0m19qEd+Ce+T+T+0C1+rXMmmAuUw==
-  dependencies:
-    "@fullcalendar/common" "~5.10.0"
-    tslib "^2.1.0"
-
 "@fullcalendar/timegrid@^5.10.0":
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/@fullcalendar/timegrid/-/timegrid-5.10.0.tgz#7177914bdc5a6c58ec4af851520b12eb8c480141"
