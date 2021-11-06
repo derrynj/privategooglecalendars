@@ -369,11 +369,16 @@ function pgc_enqueue_scripts() {
       plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.umd.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
 
   $fullcalendarVersion = get_option('pgc_fullcalendar_version');
+  $fullcalendarTheme = get_option('pgc_fullcalendar_theme');
   
   if ($fullcalendarVersion == 5) {
     // Load new FullCalendar 5 files
     wp_enqueue_style('pgc_main',
       plugin_dir_url(__FILE__) . 'lib/dist/main.css', null, PGC_PLUGIN_VERSION);
+    if (!empty($fullcalendarTheme)) {
+      wp_enqueue_style('pgc_theme',
+        plugin_dir_url(__FILE__) . 'css/themes/' . $fullcalendarTheme . '.css', null, PGC_PLUGIN_VERSION);
+    }
     wp_enqueue_script('pgc_main',
       plugin_dir_url(__FILE__) . 'lib/dist/main.js', null, PGC_PLUGIN_VERSION, true);
     $nonce = wp_create_nonce('pgc_nonce');
@@ -1121,6 +1126,9 @@ function pgc_settings_init() {
     register_setting('pgc', 'pgc_fullcalendar_version', [
       'show_in_rest' => false
     ]);
+    register_setting('pgc', 'pgc_fullcalendar_theme', [
+      'show_in_rest' => false
+    ]);
     // Added in settings: id / name / backgroundcolor / color
     register_setting('pgc', 'pgc_public_calendarlist', [
       'show_in_rest' => false
@@ -1196,6 +1204,22 @@ function pgc_settings_init() {
         <select name="pgc_fullcalendar_version" id="pgc_fullcalendar_version">
           <option value="4" <?php selected($version, '4', true); ?>>4</option>
           <option value="5" <?php selected($version, '5', true); ?>>5</option>
+        </select>
+      <?php
+    },
+    'pgc',
+    'pgc_settings_section_always'
+  );
+
+  add_settings_field(
+    'pgc_settings_fullcalendar_theme',
+    __('FullCalendar theme', 'private-google-calendars'),
+    function() {
+      $version = get_option('pgc_fullcalendar_theme');
+      ?>
+        <select name="pgc_fullcalendar_theme" id="pgc_fullcalendar_theme">
+          <option value="" <?php selected($version, '', true); ?>></option>
+          <option value="small" <?php selected($version, 'small', true); ?>>Small</option>
         </select>
       <?php
     },

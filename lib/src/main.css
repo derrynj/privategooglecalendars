@@ -2,20 +2,6 @@ tr[data-tippy-content] {
     cursor: pointer;
   }
 
-
-.fc-event {
-    cursor: pointer;
-    border:none;
-}
-
-.entry .entry-content a.fc-daygrid-day-number, .entry .entry-content a.fc-col-header-cell-cushion  {
-    text-decoration: none;
-}
-
-table.fc-col-header {
-    margin-bottom: 0;
-}
-
 .pgc-calendar-wrapper *, .pgc-calendar-wrapper *::before, .pgc-calendar-wrapper *::after {
     word-break: initial;
 }
@@ -32,11 +18,14 @@ table.fc-col-header {
 }
 
 .pgc-calendar-color {
-  width:1rem;
-  height:1rem;
+  width:1.4rem;
+  height:1.4rem;
   padding:0 .2rem;
   opacity:.4;
-  border-radius:.4rem;
+}
+
+.pgc-calendar-filter input[type=checkbox] + label {
+  margin:0;
 }
 
 .pgc-calendar-filter input[type=checkbox]:checked + label span {
@@ -45,7 +34,7 @@ table.fc-col-header {
 
 .pgc-calendar-filter input[type=checkbox] + label span:before {
   content: "✔";
-  line-height:1rem;
+  line-height:1.4rem;
   visibility:hidden;
 }
 
@@ -54,11 +43,11 @@ table.fc-col-header {
 }
 
 .pgc-calendar-filter:first-child {
-  margin-bottom:1.5em;
+  margin-bottom:1rem;
 }
 
 .pgc-calendar-filter:last-child {
-  margin-top:1.5em;
+  margin-top:1rem;
 }
 
 .pgc-event-title {
@@ -111,4 +100,21 @@ table.fc-col-header {
 .pgc-error-el {
   background-color: red;
   opacity: 1;
+}
+
+.fc-h-event {
+  border:none;
+}
+
+.fc-event {
+  cursor: pointer;
+}
+
+.pgc-calendar-wrapper .fc a {
+  text-decoration:none;
+}
+
+/* Some WP themes (like 2019) add margin-bottom to table */
+.fc table {
+  margin:0;
 }
