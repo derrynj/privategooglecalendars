@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.8.1
+Tested up to: 5.8.2
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -68,6 +68,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20211205 =
+* Option to show and hide private events.
+
 = 20211103 =
 * Sorting bug fixed
 
@@ -92,6 +95,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 This change was necessary because it's now possible to display private and public calendars at the same time.
 * These changes should not impact your current pages as long as you don't edit them. If you experience changed behaviour of existing pages, please make sure to clear all caches.
 * Added new documentation at: https://michielvaneerd.github.io/privategooglecalendars/
+
+= 20211205 =
+* Option to hide or show private events.
 
 = 20200810 =
 * When accessing public calendars use OAUth client ID when API key is empty.
