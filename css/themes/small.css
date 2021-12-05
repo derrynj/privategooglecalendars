@@ -1,5 +1,5 @@
 .fc .fc-toolbar-title {
-    font-size:1.4rem;
+    font-size: 1.4rem;
 }
 
 .fc .fc-button, .fc .fc-button .fc-icon, .fc-popover-header {
@@ -7,20 +7,34 @@
 }
 
 .pgc-calendar-wrapper {
-    padding:1rem;
+    padding: 1rem;
     background-color: white;
+    border-radius: .8rem;
 }
 
-.fc-dayGridMonth-view .fc-daygrid-event, .fc-timeGridWeek-view .fc-daygrid-event, .fc-timegrid-event, .fc-daygrid-day-number, .fc-col-header-cell,
+table.fc-list-table,
+.fc-dayGridMonth-view .fc-daygrid-event,
+.fc-timeGridWeek-view .fc-daygrid-event,
+.fc-timegrid-event,
+.fc-daygrid-day-number,
+.fc-col-header-cell,
 .fc-daygrid-more-link,
 .fc-timegrid-slot-label-cushion.fc-scrollgrid-shrink-cushion,
 .fc-timegrid-axis-cushion.fc-scrollgrid-shrink-cushion.fc-scrollgrid-sync-inner,
-table.fc-list-table,
 .fc-daygrid-event-harness  {
     font-size: .8rem;
 }
 
 /* Colors, maybe better to leave this alone (users can override it in WP admin if they want) */
-.fc a, .fc-toolbar-title, .pgc-calendar-filter-wrapper label, .fc-list-event, .fc-popover-header {
-    color:#606060;
+.fc a,
+.fc-toolbar-title,
+.pgc-calendar-filter-wrapper label,
+.fc-list-event,
+.fc-popover-header {
+    color: #606060;
+}
+
+.fc .fc-daygrid-day.fc-day-today,
+.fc .fc-timegrid-col.fc-day-today {
+    background-color: #F0F0F0;
 }

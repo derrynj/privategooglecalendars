@@ -548,10 +548,15 @@ function pgc_ajax_get_calendar() {
       // No API key and no OAuth2 token
       throw new Exception(PGC_ERRORS_TOKEN_AND_API_KEY_MISSING);
     }
+
+    $showPrivateEvents = get_option('pgc_show_private_events');
     
     $items = [];
     foreach ($results as $calendarId => $events) {
       foreach ($events as $item) {
+        if (empty($showPrivateEvents) && array_key_exists('visibility', $item) && $item['visibility'] === 'private') {
+          continue;
+        }
         $newItem = [
           'title' => empty($item['summary']) ? PGC_EVENTS_DEFAULT_TITLE : $item['summary'],
           'htmlLink' => $item['htmlLink'],
@@ -560,7 +565,8 @@ function pgc_ajax_get_calendar() {
           'creator' => !empty($item['creator']) ? $item['creator'] : [],
           'attendees' => !empty($item['attendees']) ? $item['attendees'] : [],
           'attachments' => !empty($item['attachments']) ? $item['attachments'] : [],
-          'location' => !empty($item['location']) ? $item['location'] : ''
+          'location' => !empty($item['location']) ? $item['location'] : '',
+          'visibility' => !empty($item['visibility']) ? $item['visibility'] : '',
         ];
         if (!empty($item['start']['date'])) {
           $newItem['allDay'] = true;
@@ -1123,6 +1129,9 @@ function pgc_settings_init() {
     register_setting('pgc', 'pgc_cache_time', [
       'show_in_rest' => false
     ]);
+    register_setting('pgc', 'pgc_show_private_events', [
+      'show_in_rest' => false
+    ]);
     register_setting('pgc', 'pgc_fullcalendar_version', [
       'show_in_rest' => false
     ]);
@@ -1194,6 +1203,19 @@ function pgc_settings_init() {
     },
     'pgc',
     'pgc_settings_section_always');
+
+  add_settings_field(
+    'pgc_settings_show_private_events',
+    __('Show private events', 'private-google-calendars'),
+    function() {
+      $value = get_option('pgc_show_private_events');
+      ?>
+        <input value="1" type="checkbox" name="pgc_show_private_events" <?php checked($value, '1', true); ?>>
+      <?php
+    },
+    'pgc',
+    'pgc_settings_section_always'
+  );
 
   add_settings_field(
     'pgc_settings_fullcalendar_version',
