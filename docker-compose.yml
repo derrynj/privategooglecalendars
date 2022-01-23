@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   db:
-    image: mysql:5.7
+    image: mariadb
     # connect from host with:
     # mysql -hlocalhost -P3306 --protocol=tcp -uwordpress -p
     ports:
@@ -11,7 +11,7 @@ services:
       - db_data:/var/lib/mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
@@ -19,7 +19,7 @@ services:
   wordpress:
     depends_on:
       - db
-    image: wordpress:latest
+    image: wordpress
     ports:
       - "8000:80"
     restart: always
@@ -28,17 +28,18 @@ services:
       - wp:/var/www/html
       # This only mounts the current working dir to the WP plugin dir.
       # This means that all other WP files are copied everytime after docker-compose down.
-      - ./:/var/www/html/wp-content/plugins/private-google-calendars:delegated
+      - ./:/var/www/html/wp-content/plugins/private-google-calendars
       # Remove dev dirs from the mount.
-      - src:/var/www/html/wp-content/plugins/private-google-calendars/src/
-      - node_modules:/var/www/html/wp-content/plugins/private-google-calendars/node_modules/
+      # - src:/var/www/html/wp-content/plugins/private-google-calendars/src/
+      # - node_modules:/var/www/html/wp-content/plugins/private-google-calendars/node_modules/
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
+    extra_hosts:
+      # Map the used hostname to the IP
+      - "app.local.com:172.17.0.1"
 volumes:
   db_data: {}
-  src: {}
-  node_modules: {}
   wp: {}

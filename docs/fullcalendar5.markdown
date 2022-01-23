@@ -18,7 +18,7 @@ Dit is de standaard instelling.
 
 ### Vaste hoogte zonder scrollbars
 
-Zet hiervoor de `dayMaxEvents` op `true`.
+Zet hiervoor de `dayMaxEvents` op `true`. Per dag zie je nu maximaal 1 event in de maandkalender. Als het er meer zijn, zie je de "+ x more" link.
 
 ### Flexibele hoogte zonder scrollbars
 
