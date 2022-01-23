@@ -25,14 +25,14 @@ In short these are the steps to get started:
 
 ## Configure a Google project
 
-1. Create a project in the <a href="https://console.developers.google.com/" target="_blank">Google API console</a>.
-2. Enable the _Google Calendar API_.
-3. Go to _Credentials_ and create a new _Client-ID OAuth_ credential<sup><a href="#note1">1</a></sup>.
+1. Create a project in the Google Cloud console. See <a href="https://developers.google.com/workspace/guides/create-project" target="_blank">this Google page</a> for information.
+2. Enable the _Google Calendar API_. See <a href="https://developers.google.com/workspace/guides/enable-apis" target="_blank">this Google page</a> for information.
+3. Create a new _OAuth client ID_<sup><a href="#note1">1</a></sup> credential in the credentials setting. See <a href="https://developers.google.com/workspace/guides/create-credentials" target="_blank">this Google page</a> for information.
 4. Choose _Webapplication_ for the type.
 5. Add the _authorised redirect URI_. Make sure to copy and paste the redirect URI you see in the Private Google Calendars settings page in the orange box __exactly__ as displayed, otherwise _it will not work_.
-6. Click on _Create_ and download the client secret JSON file.
+6. Click on _Create_ and download the client secret JSON file, because this file must be uploaded to the Wordpress plugin.
 
-<em id="note1">Note 1</em>: This is the preferred way of configuring access to Google calendars and the only <a href="https://developers.google.com/calendar/auth#AboutAuthorization" target="_blank">officially supported</a> way. However up until now Google seems to support the use of and API key for access to _public_ Google calendars. But the use of an _Client-ID OAuth_ credential over and _API key_ is strongly recommended even for public calendars.
+<em id="note1">Note 1</em>: This is the preferred way of configuring access to Google calendars and the only <a href="https://developers.google.com/calendar/auth#AboutAuthorization" target="_blank">officially supported</a> way. However up until now Google seems to support the use of and API key for access to _public_ Google calendars. But the use of an _OAuth client ID_ credential over and _API key_ is strongly recommended even for public calendars.
 
 ## Setting up the plugin
 
