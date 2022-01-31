@@ -6,6 +6,13 @@ permalink: /fullcalendar5/
 
 ## FullCalendar 5
 
+### TODO:
+- Als je eventColor zet, dan deze ook doorvoeren bij custom event colors!
+- Dit geldt ook voor de eventTextColor: deze wordt bij custom event colors volgens mij niet overruled.
+- "eventColor": "red",
+  "eventTextColor": "white",
+  "eventDisplay": "block"
+
 Deze plugin gebruikt FullCalendar 5 om de Google agenda's weer te geven. Alle eigenschappen die je aan FullCalendar 5 kunt meegeven, kun je ook meegeven aan deze plugin.
 Zie voor alle eigenschappen de <a href="https://fullcalendar.io/docs">FullCalendar 5 documentatie</a>.
 Als je de shortcode gebruikt, houdt dan rekening met het omschrijven van de eigenschappen (zie homepage).
