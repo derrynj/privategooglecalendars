@@ -11,7 +11,8 @@
     "@fullcalendar/core": "^5.10.0",
     "@fullcalendar/daygrid": "^5.10.0",
     "@fullcalendar/list": "^5.10.0",
-    "@fullcalendar/timegrid": "^5.10.0"
+    "@fullcalendar/timegrid": "^5.10.0",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "css-loader": "^6.5.0",

@@ -1,8 +1,8 @@
-(function(win, $) {
+(function (win, $) {
 
   var document = win.document;
-  
-  win.pgc_on_submit = function() {
+
+  win.pgc_on_submit = function () {
 
     // TODO: Not used anymore, because we also have public API key.
     // var file = $("#pgc_client_secret");
@@ -17,7 +17,7 @@
     // }
 
     // Public calendars
-    document.querySelectorAll("input[data-delete-target-id]").forEach(function(input) {
+    document.querySelectorAll("input[data-delete-target-id]").forEach(function (input) {
       if (input.checked) {
         var tr = document.querySelector("tr[data-source-id='" + input.getAttribute("data-delete-target-id") + "']");
         tr.parentNode.removeChild(tr);
@@ -29,7 +29,7 @@
       var tr = publicCalendarRows[i];
       var emptyInputs = 0;
       var inputs = tr.querySelectorAll("input.pgc-public-calendar-id, input.pgc-public-calendar-title, input.pgc-public-calendar-backgroundcolor");
-      inputs.forEach(function(input) {
+      inputs.forEach(function (input) {
         if (input.value === "") {
           emptyInputs += 1;
         }
@@ -51,4 +51,20 @@
     return true;
   };
 
-}(this, jQuery));
+  window.addEventListener('DOMContentLoaded', function () {
+
+    function handleFCVersion(value) {
+      var isFour = value == 4;
+      document.getElementById('pgc_fullcalendar_theme').disabled = isFour;
+      document.getElementById('pgc_tippy_theme').disabled = isFour;
+    }
+
+    document.getElementById('pgc_fullcalendar_version').addEventListener('change', function () {
+      handleFCVersion(this.value);
+    });
+
+    handleFCVersion(document.getElementById('pgc_fullcalendar_version').value);
+
+  });
+
+}(window));

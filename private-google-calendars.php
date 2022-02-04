@@ -361,15 +361,10 @@ add_action('wp_enqueue_scripts', 'pgc_enqueue_scripts', PGC_ENQUEUE_ACTION_PRIOR
 function pgc_enqueue_scripts() {
 
   wp_enqueue_style('dashicons');
-  wp_enqueue_style('tippy_light',
-      plugin_dir_url(__FILE__) . 'lib/tippy/light-border.css', null, PGC_PLUGIN_VERSION);
-  wp_enqueue_script('popper',
-      plugin_dir_url(__FILE__) . 'lib/popper.min.js', null, PGC_PLUGIN_VERSION, true);
-  wp_enqueue_script('tippy',
-      plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.umd.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
 
   $fullcalendarVersion = get_option('pgc_fullcalendar_version');
   $fullcalendarTheme = get_option('pgc_fullcalendar_theme');
+  $tippyTheme = get_option('pgc_tippy_theme');
   
   if ($fullcalendarVersion == 5) {
     // Load new FullCalendar 5 files
@@ -385,19 +380,28 @@ function pgc_enqueue_scripts() {
     wp_localize_script('pgc_main', 'pgc_object', [
       'ajax_url' => admin_url('admin-ajax.php'),
       'nonce' => $nonce,
+      'tippy_theme' => $tippyTheme,
       'trans' => [
         'all_day' => __('All day', 'private-google-calendars'),
         'created_by' => __('Created by', 'private-google-calendars'),
         'go_to_event' => __('Go to event', 'private-google-calendars'),
         'unknown_error' => __('Unknown error', 'private-google-calendars'),
         'request_error' => __('Request error', 'private-google-calendars'),
-        'loading' => __('Loading', 'private-google-calendars')
+        'loading' => __('Loading', 'private-google-calendars'),
       ]
     ]);
     return;
   }
 
   // Old FullCalendar (4)
+
+  wp_enqueue_style('tippy_light',
+      plugin_dir_url(__FILE__) . 'lib/tippy/light-border.css', null, PGC_PLUGIN_VERSION);
+  wp_enqueue_script('popper',
+      plugin_dir_url(__FILE__) . 'lib/popper.min.js', null, PGC_PLUGIN_VERSION, true);
+  wp_enqueue_script('tippy',
+      plugin_dir_url(__FILE__) . 'lib/tippy/tippy-bundle.umd.min.js', ['popper'], PGC_PLUGIN_VERSION, true);
+
   wp_enqueue_style('pgc_fullcalendar',
       plugin_dir_url(__FILE__) . 'lib/fullcalendar4/core/main.min.css', null, PGC_PLUGIN_VERSION);
   wp_enqueue_style('pgc_fullcalendar_daygrid',
@@ -1105,7 +1109,7 @@ function pgc_settings_init() {
         'pgc_settings_section_public',
         __('Public calendar settings', 'private-google-calendars'),
         function() {
-          _e('Access to public calendars require an API key.', 'private-google-calendars');
+          _e('Access to public calendars require an API key.<br><strong>Note: using an API key to access calendars is not officially supported by Google so use it at your own risk!</strong>', 'private-google-calendars');
         }, // leeg
         'pgc'); // page, slug
 
@@ -1136,6 +1140,9 @@ function pgc_settings_init() {
       'show_in_rest' => false
     ]);
     register_setting('pgc', 'pgc_fullcalendar_theme', [
+      'show_in_rest' => false
+    ]);
+    register_setting('pgc', 'pgc_tippy_theme', [
       'show_in_rest' => false
     ]);
     // Added in settings: id / name / backgroundcolor / color
@@ -1242,6 +1249,22 @@ function pgc_settings_init() {
         <select name="pgc_fullcalendar_theme" id="pgc_fullcalendar_theme">
           <option value="" <?php selected($version, '', true); ?>></option>
           <option value="small" <?php selected($version, 'small', true); ?>>Small</option>
+        </select>
+      <?php
+    },
+    'pgc',
+    'pgc_settings_section_always'
+  );
+
+  add_settings_field(
+    'pgc_settings_tippy_theme',
+    __('Event popup theme', 'private-google-calendars'),
+    function() {
+      $version = get_option('pgc_tippy_theme');
+      ?>
+        <select name="pgc_tippy_theme" id="pgc_tippy_theme">
+          <option value="" <?php selected($version, '', true); ?>>Light</option>
+          <option value="dark" <?php selected($version, 'dark', true); ?>>Dark</option>
         </select>
       <?php
     },
