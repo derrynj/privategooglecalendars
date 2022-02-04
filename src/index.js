@@ -369,7 +369,59 @@ registerBlockType('pgc-plugin/calendar', {
                         hidepasseddays: 0,
                     }
                 }
-            }
+            },
+            save(props) {
+                const attrs = {};
+                const attrsArray = [];
+                const config = props.attributes.config;
+                const hideoptions = props.attributes.hideoptions;
+                const fullcalendarconfig = props.attributes.fullcalendarconfig;
+                let hasValidConfig = false;
+                try {
+                    hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
+                } catch (ex) {
+        
+                }
+                if (hasValidConfig) {
+                    attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
+                }
+                Object.keys(config).forEach(function (key) {
+                    if (key === 'filter') {
+                        attrsArray.push(key + '="' + (config[key]) + '"');
+                    } else {
+                        attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
+                    }
+                });
+        
+                attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
+                attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
+        
+                if (props.attributes.publiccalendarids || Object.keys(props.attributes.calendars).length) {
+                    attrs.calendarids = props.attributes.publiccalendarids;
+                    if (Object.keys(props.attributes.calendars).length) {
+                        const calendarids = [];
+                        Object.keys(props.attributes.calendars).forEach(function (id) {
+                            if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
+                                calendarids.push(id);
+                            }
+                        });
+                        attrs.calendarids += (attrs.calendarids.length && calendarids.length ? "," : "") + calendarids.join(",");
+                    }
+                }
+        
+                // Only if present set to save function.
+                // This means we don't have to use a deprecated version for this, because in previous versions this was not present
+                // and thus not displayed in save object.
+                if (props.attributes.uncheckedcalendarids) {
+                    attrs.uncheckedcalendarids = props.attributes.uncheckedcalendarids;
+                }
+        
+                Object.keys(attrs).forEach(function (key) {
+                    attrsArray.push(key + '="' + attrs[key] + '"');
+                });
+        
+                return <p>[pgc {attrsArray.join(" ")}]</p>
+            },
         },
         {
             attributes: {
