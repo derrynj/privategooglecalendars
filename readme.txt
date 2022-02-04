@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.8.2
+Tested up to: 5.9
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -67,6 +67,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/mai
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
 
 == Changelog ==
+
+= 20220204 =
+* FullCalendar 5 support!
+* Using eventColor overrules custom Google event colors
 
 = 20211205 =
 * Option to show and hide private events.
