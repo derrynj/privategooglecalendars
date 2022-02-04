@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20220205
+Version: 20220206
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20220205');
+define('PGC_PLUGIN_VERSION', '20220206');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -78,6 +78,26 @@ if (is_admin()) {
   $plugin = plugin_basename(__FILE__);
   add_filter('plugin_action_links_' . $plugin, 'pgc_add_plugin_settings_links');
   add_filter('network_admin_plugin_action_links_' . $plugin, 'pgc_add_plugin_settings_links');
+}
+
+function pgc_wrap_in_theme_class($theme) {
+  return 'pgc-theme-' . $theme;
+}
+
+function pgc_get_current_theme($userTheme) {
+  if (!empty($userTheme)) return $userTheme;
+  return get_option('pgc_fullcalendar_theme');
+}
+
+function pgc_get_themes() {
+  $files = scandir(__DIR__ . '/css/themes');
+  $themes = [];
+  foreach ($files as $file) {
+    if (preg_match("/^(.+)\.css$/", $file, $matches)) {
+      $themes[] = $matches[1];
+    }
+  }
+  return $themes;
 }
 
 function pgc_add_plugin_settings_links($links) {
@@ -165,7 +185,10 @@ function pgc_register_block() {
     'hide_filter' => __('Hide filter', 'private-google-calendars'),
     'filter_options' => __('Filter options', 'private-google-calendars'),
     'filter_uncheckedcalendarids' => __('Unchecked calendar IDs', 'private-google-calendars'),
-    'plugin_version' => PGC_PLUGIN_VERSION
+    'plugin_version' => PGC_PLUGIN_VERSION,
+    'theme' => __('Theme', 'private-google-calendars'),
+    'default' => __('Default', 'private-google-calendars'),
+    'themes' => pgc_get_themes()
   ];
 
   wp_add_inline_script('pgc-plugin-script', 'window.pgc_selected_calendars=' . json_encode($selectedCalendars) . ';', 'before');
@@ -201,6 +224,7 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   ];
   $userConfig = $defaultConfig; // copy
   $userFilter = 'top';
+  $userTheme = '';
   $userEventPopup = 'true';
   $userEventLink = 'false';
   $userHidePassed = 'false';
@@ -221,6 +245,10 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
     }
     if ($key === 'filter') {
       $userFilter = $value === 'true' ? 'top' : $value;
+      continue;
+    }
+    if ($key === 'theme') {
+      $userTheme = $value;
       continue;
     }
     if ($key === 'eventpopup') {
@@ -331,14 +359,16 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
 
   $filterHTML = '<div class="pgc-calendar-filter" ' . $dataUnchekedCalendarIds . '></div>';
 
-  return '<div class="pgc-calendar-wrapper pgc-calendar-page">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
+  $activeTheme = pgc_get_current_theme($userTheme);
+
+  return '<div class="pgc-calendar-wrapper pgc-calendar-page ' . pgc_wrap_in_theme_class($activeTheme) . '">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
     . $dataCalendarIds . ' data-filter=\'' . $userFilter . '\' data-eventpopup=\'' . $userEventPopup . '\' data-eventlink=\''
     . $userEventLink . '\' data-eventdescription=\'' . $userEventDescription . '\' data-eventlocation=\''
     . $userEventLocation . '\' data-eventattachments=\'' . $userEventAttachments . '\' data-eventattendees=\''
     . $userEventAttendees . '\' data-eventcreator=\'' . $userEventCreator . '\' data-eventcalendarname=\''
     . $userEventCalendarname . '\' data-hidefuture=\'' . $userHideFuture . '\' data-hidepassed=\''
     . $userHidePassed . '\' data-config=\'' . json_encode($userConfig) . '\' data-locale="'
-    . get_locale() . '" class="pgc-calendar"></div>' . ($userFilter === 'bottom' ? $filterHTML : '') . '</div>';
+    . get_locale() . '" data-theme="' . $activeTheme . '" class="pgc-calendar"></div>' . ($userFilter === 'bottom' ? $filterHTML : '') . '</div>';
 }
 
 /**
@@ -366,7 +396,7 @@ function pgc_enqueue_scripts() {
   $fullcalendarTheme = get_option('pgc_fullcalendar_theme');
   $tippyTheme = get_option('pgc_tippy_theme');
   
-  if ($fullcalendarVersion == 5) {
+  if ($fullcalendarVersion >= 5) {
     // Load new FullCalendar 5 files
     wp_enqueue_style('pgc_main',
       plugin_dir_url(__FILE__) . 'lib/dist/main.css', null, PGC_PLUGIN_VERSION);
@@ -379,6 +409,7 @@ function pgc_enqueue_scripts() {
     $nonce = wp_create_nonce('pgc_nonce');
     wp_localize_script('pgc_main', 'pgc_object', [
       'ajax_url' => admin_url('admin-ajax.php'),
+      'themes_url' => plugin_dir_url(__FILE__) . 'css/themes',
       'nonce' => $nonce,
       'tippy_theme' => $tippyTheme,
       'trans' => [
@@ -1140,7 +1171,7 @@ function pgc_settings_init() {
       'show_in_rest' => false
     ]);
     register_setting('pgc', 'pgc_fullcalendar_theme', [
-      'show_in_rest' => false
+      'show_in_rest' => true
     ]);
     register_setting('pgc', 'pgc_tippy_theme', [
       'show_in_rest' => false
@@ -1246,13 +1277,7 @@ function pgc_settings_init() {
     __('FullCalendar theme', 'private-google-calendars'),
     function() {
       $version = get_option('pgc_fullcalendar_theme');
-      $files = scandir(__DIR__ . '/css/themes');
-      $themes = [];
-      foreach ($files as $file) {
-        if (preg_match("/^(.+)\.css$/", $file, $matches)) {
-          $themes[] = $matches[1];
-        }
-      }
+      $themes = pgc_get_themes();
       $themes = array_map(function($theme) use ($version) {
         return '<option value="' . $theme . '" ' . selected($version, $theme, false) . '>' . ucfirst($theme) . '</option>';
       }, $themes);
@@ -1604,6 +1629,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $publicCalendarids = isset($instance['publiccalendarids']) ? $instance['publiccalendarids'] : "";
     $uncheckedCalendarids = isset($instance['uncheckedcalendarids']) ? $instance['uncheckedcalendarids'] : "";
     $filter = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
+    $userTheme =isset($instance['config']) ? $instance['theme'] : '';
     $eventpopup = $this->instanceOptionToBooleanString($instance, 'eventpopup', 'true');
     $eventlink = $this->instanceOptionToBooleanString($instance, 'eventlink', 'false');
     $eventdescription = $this->instanceOptionToBooleanString($instance, 'eventdescription', 'false');
@@ -1640,6 +1666,8 @@ class Pgc_Calendar_Widget extends WP_Widget {
       $config = json_decode($config, true);
     }
 
+    $activeTheme = pgc_get_current_theme($userTheme);
+
     $thisCalendarids = array_merge((!empty($publicCalendarids) ? array_map('trim', explode(',', $publicCalendarids)) : []), $privateCalendaridsNew);
 
     echo $args['before_widget'];
@@ -1651,12 +1679,13 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $filterHTML = '<div class="pgc-calendar-filter"' . $dataUnchekedCalendarIds . '></div>';
 
     ?>
-    <div class="pgc-calendar-wrapper pgc-calendar-widget">
+    <div class="pgc-calendar-wrapper pgc-calendar-widget <?php echo pgc_wrap_in_theme_class($activeTheme); ?>">
       <?php if ($filter === 'top') echo $filterHTML; ?>
       <div
           data-config='<?php echo json_encode($config); ?>'
           data-calendarids='<?php echo json_encode($thisCalendarids); ?>'
           data-filter='<?php echo $filter; ?>'
+          data-theme='<?php echo $activeTheme; ?>'
           data-eventpopup='<?php echo $eventpopup; ?>'
           data-eventlink='<?php echo $eventlink; ?>'
           data-eventdescription='<?php echo $eventdescription; ?>'
@@ -1683,6 +1712,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $uncheckedCalendarids = isset($instance['uncheckedcalendarids']) ? $instance['uncheckedcalendarids'] : '';
     
     $filterValue = isset($instance['filter']) ? ($instance['filter'] === 'true' ? 'top' : $instance['filter']) : '';
+    $themeValue = isset($instance['theme']) ? $instance['theme'] : '';
     $eventpopupValue = isset($instance['eventpopup']) ? $instance['eventpopup'] === 'true' : true;
     $eventlinkValue = isset($instance['eventlink']) ? $instance['eventlink'] === 'true' : false;
     $eventdescriptionValue = isset($instance['eventdescription']) ? $instance['eventdescription'] === 'true' : false;
@@ -1714,6 +1744,14 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $publicCalendarIdsAreaId = $this->get_field_id('publiccalendarids');
     $privateCalendarIdsAreaId = $this->get_field_id('privatecalendarids');
     $privateCalendarIdsName = $this->get_field_name('privatecalendarids');
+
+    $themes = [];
+    if (get_option('pgc_fullcalendar_version') >= 5) {
+      $themes = pgc_get_themes();
+      $themes = array_map(function($theme) use ($themeValue) {
+        return '<option value="' . $theme . '" ' . selected($themeValue, $theme, false) . '>' . ucfirst($theme) . '</option>';
+      }, $themes);
+    }
 
     ?>
 
@@ -1792,6 +1830,18 @@ class Pgc_Calendar_Widget extends WP_Widget {
           id="<?php echo $this->get_field_id('hidefuturedays'); ?>"
           value="<?php echo $hidefuturedaysValue; ?>" /> <?php _e('from now', 'private-google-calendars'); ?></label>
       </p>
+
+      <?php if (!empty($themes)) { ?>
+      <p>
+      <strong class="pgc-calendar-widget-row"><?php _e('Theme', 'private-google-calendars'); ?></strong>
+      <label><select
+      id="<?php echo $this->get_field_id('theme'); ?>"
+      name="<?php echo $this->get_field_name('theme'); ?>">
+      <option value=''><?php _e('Default', 'private-google-calendars'); ?></option>
+        <?php echo implode("\n", $themes); ?>
+      </select></label>
+      </p>
+      <?php } ?>
 
       <p>
       <strong class="pgc-calendar-widget-row"><?php _e('Filter options', 'private-google-calendars'); ?></strong>
@@ -1979,6 +2029,9 @@ class Pgc_Calendar_Widget extends WP_Widget {
         : ''; 
     $instance['publiccalendarids'] = (!empty($new_instance['publiccalendarids']))
         ? strip_tags($new_instance['publiccalendarids'] )
+        : '';
+    $instance['theme'] = (!empty($new_instance['theme']))
+        ? strip_tags($new_instance['theme'] )
         : '';
     $instance['uncheckedcalendarids'] = (!empty($new_instance['uncheckedcalendarids']))
         ? strip_tags($new_instance['uncheckedcalendarids'] )

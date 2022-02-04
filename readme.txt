@@ -68,6 +68,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20220206 =
+* Themes and overridable themes per calendar
+
 = 20220205 =
 * FullCalendar 5 support!
 * Using eventColor overrules custom Google event colors

@@ -1,52 +1,56 @@
-.fc .fc-toolbar-title {
+
+
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-toolbar-title {
     font-size: 1.4rem;
 }
 
-.fc .fc-button, .fc .fc-button .fc-icon, .fc-popover-header {
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-button,
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-button .fc-icon,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-popover-header {
     font-size: 1rem;
 }
 
-.pgc-calendar-wrapper {
+.pgc-calendar-wrapper.pgc-theme-dark {
     padding: 1rem;
     background-color: black;
     border-radius: .4rem;
 }
 
-table.fc-list-table,
-.fc-dayGridMonth-view .fc-daygrid-event,
-.fc-timeGridWeek-view .fc-daygrid-event,
-.fc-timegrid-event,
-.fc-daygrid-day-number,
-.fc-col-header-cell,
-.fc-daygrid-more-link,
-.fc-timegrid-slot-label-cushion.fc-scrollgrid-shrink-cushion,
-.fc-timegrid-axis-cushion.fc-scrollgrid-shrink-cushion.fc-scrollgrid-sync-inner,
-.fc-daygrid-event-harness  {
+.pgc-calendar-wrapper.pgc-theme-dark table.fc-list-table,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-dayGridMonth-view .fc-daygrid-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timeGridWeek-view .fc-daygrid-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timegrid-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-daygrid-day-number,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-col-header-cell,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-daygrid-more-link,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timegrid-slot-label-cushion.fc-scrollgrid-shrink-cushion,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timegrid-axis-cushion.fc-scrollgrid-shrink-cushion.fc-scrollgrid-sync-inner,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-daygrid-event-harness  {
     font-size: .8rem;
 }
 
 /* Colors, maybe better to leave this alone (users can override it in WP admin if they want) */
-.fc a,
-.fc-toolbar-title,
-.pgc-calendar-filter-wrapper label,
-.fc-list-event,
-.fc-popover-header {
+.pgc-calendar-wrapper.pgc-theme-dark .fc a,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-toolbar-title,
+.pgc-calendar-wrapper.pgc-theme-dark .pgc-calendar-filter-wrapper label,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-list-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-popover-header {
     color: white;
 }
 
-.fc .fc-day-other .fc-daygrid-day-top {
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-day-other .fc-daygrid-day-top {
     opacity: .6;
 }
 
-.fc .fc-daygrid-day.fc-day-today,
-.fc .fc-timegrid-col.fc-day-today {
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-daygrid-day.fc-day-today,
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-timegrid-col.fc-day-today {
     background-color: #F0F0F0;
 }
 
-.fc-theme-standard .fc-list-day-cushion {
+.pgc-calendar-wrapper.pgc-theme-dark .fc-theme-standard .fc-list-day-cushion {
     background-color: #2C3E50;
 }
 
-tr.fc-list-event.fc-event:hover > td {
+.pgc-calendar-wrapper.pgc-theme-dark tr.fc-list-event.fc-event:hover > td {
     background-color: #333 !important;
 }

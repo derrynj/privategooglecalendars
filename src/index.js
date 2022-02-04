@@ -52,6 +52,7 @@ registerBlockType('pgc-plugin/calendar', {
             type: "object",
             default: {
                 filter: "top",
+                theme: "",
                 eventpopup: false,
                 eventlink: false,
                 eventdescription: false,
@@ -142,7 +143,7 @@ registerBlockType('pgc-plugin/calendar', {
         };
 
         let calendarList = null;
-        
+
         calendarList = Object.keys(window.pgc_selected_calendars).map((id) => {
             const calendar = window.pgc_selected_calendars[id];
             return <CheckboxControl style={{ backgroundColor: calendar.backgroundColor }} className="pgc-sidebar-row" onChange={onCalendarSelectionChange.bind(id)}
@@ -152,7 +153,7 @@ registerBlockType('pgc-plugin/calendar', {
             calendarList.push(<em>No private calendars</em>);
         }
         calendarList.push(<HorizontalRule />);
-        
+
 
         const eventPopupList = [
             ["eventpopup", window.pgc_trans.eventpopup],
@@ -245,6 +246,15 @@ registerBlockType('pgc-plugin/calendar', {
                         {hideFutureDays}
                     </PanelBody>
                     <PanelBody
+                        title={window.pgc_trans.theme}
+                        initialOpen={true}>
+                        <SelectControl value={config.theme || ''} onChange={onCalendarConfigChange.bind('theme')} options={[
+                            { value: '', label: window.pgc_trans.default }, ...window.pgc_trans.themes.map(function (theme) {
+                                return { value: theme, label: theme };
+                            })
+                        ]} />
+                    </PanelBody>
+                    <PanelBody
                         title={window.pgc_trans.filter_options}>
                         <SelectControl value={config.filter === true ? "top" : config.filter} onChange={onCalendarConfigChange.bind('filter')} options={[
                             { value: '', label: window.pgc_trans.hide_filter },
@@ -252,7 +262,7 @@ registerBlockType('pgc-plugin/calendar', {
                             { value: 'bottom', label: window.pgc_trans.show_filter_bottom }
                         ]} />
                         <TextControl label={window.pgc_trans.filter_uncheckedcalendarids} value={uncheckedcalendarids} onChange={onUncheckedCalendarIdsChange} />
-                        </PanelBody>
+                    </PanelBody>
                     <PanelBody
                         title={window.pgc_trans.popup_options + " (" + (config.eventpopup ? window.pgc_trans.show : window.pgc_trans.hide) + ")"}
                         initialOpen={true}>
@@ -275,13 +285,13 @@ registerBlockType('pgc-plugin/calendar', {
         try {
             hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
         } catch (ex) {
-            
+
         }
         if (hasValidConfig) {
             attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
         }
         Object.keys(config).forEach(function (key) {
-            if (key === 'filter') {
+            if (key === 'filter' || key === 'theme') {
                 attrsArray.push(key + '="' + (config[key]) + '"');
             } else {
                 attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
@@ -295,12 +305,12 @@ registerBlockType('pgc-plugin/calendar', {
             attrs.calendarids = props.attributes.publiccalendarids;
             if (Object.keys(props.attributes.calendars).length) {
                 const calendarids = [];
-                    Object.keys(props.attributes.calendars).forEach(function (id) {
-                        if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
-                            calendarids.push(id);
-                        }
-                    });
-                    attrs.calendarids += (attrs.calendarids.length && calendarids.length ? "," : "") + calendarids.join(",");
+                Object.keys(props.attributes.calendars).forEach(function (id) {
+                    if ((id in props.attributes.calendars) && props.attributes.calendars[id]) {
+                        calendarids.push(id);
+                    }
+                });
+                attrs.calendarids += (attrs.calendarids.length && calendarids.length ? "," : "") + calendarids.join(",");
             }
         }
 
@@ -371,7 +381,7 @@ registerBlockType('pgc-plugin/calendar', {
                 try {
                     hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
                 } catch (ex) {
-                    
+
                 }
                 if (hasValidConfig) {
                     attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
@@ -383,10 +393,10 @@ registerBlockType('pgc-plugin/calendar', {
                         attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
                     }
                 });
-        
+
                 attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
                 attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
-        
+
                 if (props.attributes.config.public) {
                     attrs.calendarids = props.attributes.publiccalendarids;
                 } else {
@@ -402,18 +412,18 @@ registerBlockType('pgc-plugin/calendar', {
                         }
                     }
                 }
-        
+
                 // Only if present set to save function.
                 // This means we don't have to use a deprecated version for this, because in previous versions this was not present
                 // and thus not displayed in save object.
                 if (props.attributes.uncheckedcalendarids) {
                     attrs.uncheckedcalendarids = props.attributes.uncheckedcalendarids;
                 }
-        
+
                 Object.keys(attrs).forEach(function (key) {
                     attrsArray.push(key + '="' + attrs[key] + '"');
                 });
-        
+
                 return <p>[pgc {attrsArray.join(" ")}]</p>
             }
         },
@@ -466,7 +476,7 @@ registerBlockType('pgc-plugin/calendar', {
                 try {
                     hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
                 } catch (ex) {
-                    
+
                 }
                 if (hasValidConfig) {
                     attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
