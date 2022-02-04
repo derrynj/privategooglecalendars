@@ -26,6 +26,7 @@ tr[data-tippy-content] {
 
 .pgc-calendar-filter input[type=checkbox] + label {
   margin:0 1rem 0 0;
+  padding:0;
 }
 
 .pgc-calendar-filter input[type=checkbox]:checked + label span {
@@ -122,4 +123,20 @@ tr[data-tippy-content] {
 /* If I use "eventDisplay": "block" then the times of timed events are almost not visible because there are cutted off */
 .fc-h-event .fc-event-time {
   overflow:visible;
+}
+
+@media(max-width:649px) {
+  .fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom:.6rem;
+  }
+  .fc .fc-toolbar {
+    display:block;
+  }
+  .fc-toolbar-chunk {
+    display:block;
+    text-align:center;
+  }
+  .fc-toolbar > div {
+    margin-bottom:.6rem;
+  }
 }
