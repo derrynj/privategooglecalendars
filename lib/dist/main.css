@@ -1595,4 +1595,9 @@ tr[data-tippy-content] {
   margin:0;
 }
 
+/* If I use "eventDisplay": "block" then the times of timed events are almost not visible because there are cutted off */
+.fc-h-event .fc-event-time {
+  overflow:visible;
+}
+
 /*# sourceMappingURL=main.css.map*/

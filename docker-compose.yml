@@ -30,16 +30,20 @@ services:
       # This means that all other WP files are copied everytime after docker-compose down.
       - ./:/var/www/html/wp-content/plugins/private-google-calendars
       # Remove dev dirs from the mount.
-      # - src:/var/www/html/wp-content/plugins/private-google-calendars/src/
-      # - node_modules:/var/www/html/wp-content/plugins/private-google-calendars/node_modules/
+      - src:/var/www/html/wp-content/plugins/private-google-calendars/src/
+      - node_modules:/var/www/html/wp-content/plugins/private-google-calendars/node_modules/
+      - node_modules_lib:/var/www/html/wp-content/plugins/private-google-calendars/lib/node_modules/
     environment:
       WORDPRESS_DB_HOST: db:3306
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
-    extra_hosts:
-      # Map the used hostname to the IP
-      - "app.local.com:172.17.0.1"
+    #extra_hosts:
+      # Map the used hostname to the IP only for Multipass
+    #  - "app.local.com:172.17.0.1"
 volumes:
   db_data: {}
   wp: {}
+  src: {}
+  node_modules: {}
+  node_modules_lib: {}

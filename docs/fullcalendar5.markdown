@@ -13,6 +13,12 @@ permalink: /fullcalendar5/
   "eventTextColor": "white",
   "eventDisplay": "block"
 
+
+## Color:
+
+- Als je events een bepaalde kleur geeft in de Google calendar, dan MOET je eerst Get colorlist kiezen in de settings pagina.
+Want die download de kleuren voor je custom events.
+
 Deze plugin gebruikt FullCalendar 5 om de Google agenda's weer te geven. Alle eigenschappen die je aan FullCalendar 5 kunt meegeven, kun je ook meegeven aan deze plugin.
 Zie voor alle eigenschappen de <a href="https://fullcalendar.io/docs">FullCalendar 5 documentatie</a>.
 Als je de shortcode gebruikt, houdt dan rekening met het omschrijven van de eigenschappen (zie homepage).
@@ -21,11 +27,15 @@ Als je de shortcode gebruikt, houdt dan rekening met het omschrijven van de eige
 
 ### Vaste hoogte met eventueel scrollbars
 
-Dit is de standaard instelling.
+Dit is de standaard instelling. De calendar heeft een hoogte op basis van de aspectRatio. Dus de gehele width wordt gebruikt en op basis daarvan wordt bepaald wat de hoogte is
+van de rijen.
 
 ### Vaste hoogte zonder scrollbars
 
-Zet hiervoor de `dayMaxEvents` op `true`. Per dag zie je nu maximaal 1 event in de maandkalender. Als het er meer zijn, zie je de "+ x more" link.
+Zet hiervoor de `dayMaxEvents` op `true`. Als het er meer zijn, zie je de "+ x more" link.
+A.h.v. de 'height' setting wordt dan bepaald of er een + link getoond moet worden.
+Bijv. als height '800px' is, dan worden er zoveel mogelijk events getoond en als dat niet meer kan, dan een + link.
+Als je de height NIET zet, dan zie je waarschijnlijk maar max 1 event in een dag.
 
 ### Flexibele hoogte zonder scrollbars
 
