@@ -1246,10 +1246,20 @@ function pgc_settings_init() {
     __('FullCalendar theme', 'private-google-calendars'),
     function() {
       $version = get_option('pgc_fullcalendar_theme');
+      $files = scandir(__DIR__ . '/css/themes');
+      $themes = [];
+      foreach ($files as $file) {
+        if (preg_match("/^(.+)\.css$/", $file, $matches)) {
+          $themes[] = $matches[1];
+        }
+      }
+      $themes = array_map(function($theme) use ($version) {
+        return '<option value="' . $theme . '" ' . selected($version, $theme, false) . '>' . ucfirst($theme) . '</option>';
+      }, $themes);
       ?>
         <select name="pgc_fullcalendar_theme" id="pgc_fullcalendar_theme">
-          <option value="" <?php selected($version, '', true); ?>></option>
-          <option value="small" <?php selected($version, 'small', true); ?>>Small</option>
+          <option value="" <?php selected($version, '', true); ?>>No theme...</option>
+          <?php echo implode("\n", $themes); ?>
         </select>
       <?php
     },

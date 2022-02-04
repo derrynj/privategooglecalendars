@@ -8,8 +8,8 @@
 
 .pgc-calendar-wrapper {
     padding: 1rem;
-    background-color: white;
-    border-radius: .8rem;
+    background-color: black;
+    border-radius: .4rem;
 }
 
 table.fc-list-table,
@@ -31,10 +31,22 @@ table.fc-list-table,
 .pgc-calendar-filter-wrapper label,
 .fc-list-event,
 .fc-popover-header {
-    color: #606060;
+    color: white;
+}
+
+.fc .fc-day-other .fc-daygrid-day-top {
+    opacity: .6;
 }
 
 .fc .fc-daygrid-day.fc-day-today,
 .fc .fc-timegrid-col.fc-day-today {
     background-color: #F0F0F0;
+}
+
+.fc-theme-standard .fc-list-day-cushion {
+    background-color: #2C3E50;
+}
+
+tr.fc-list-event.fc-event:hover > td {
+    background-color: #333 !important;
 }
