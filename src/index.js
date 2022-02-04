@@ -337,6 +337,49 @@ registerBlockType('pgc-plugin/calendar', {
                 config: {
                     type: "object",
                     default: {
+                        filter: "top",
+                        eventpopup: false,
+                        eventlink: false,
+                        eventdescription: false,
+                        eventlocation: false,
+                        eventattendees: false,
+                        eventattachments: false,
+                        eventcreator: false,
+                        eventcalendarname: false
+                    }
+                },
+                fullcalendarconfig: {
+                    type: "string",
+                    default: ""
+                },
+                publiccalendarids: {
+                    type: "string",
+                    default: ""
+                },
+                uncheckedcalendarids: {
+                    type: "string",
+                    default: ""
+                },
+                hideoptions: {
+                    type: "object",
+                    default: {
+                        hidefuture: false,
+                        hidefuturedays: 0,
+                        hidepassed: false,
+                        hidepasseddays: 0,
+                    }
+                }
+            }
+        },
+        {
+            attributes: {
+                calendars: {
+                    type: "object",
+                    default: {}
+                },
+                config: {
+                    type: "object",
+                    default: {
                         public: false,
                         filter: "top",
                         eventpopup: false,
