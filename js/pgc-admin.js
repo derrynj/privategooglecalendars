@@ -53,6 +53,12 @@
 
   window.addEventListener('DOMContentLoaded', function () {
 
+    document.body.addEventListener("click", function (e) {
+      if (e.target.className === 'pgc-copy-text') {
+        navigator.clipboard.writeText(e.target.innerText);
+      }
+    });
+
     function handleFCVersion(value) {
       var isFour = value == 4;
       document.getElementById('pgc_fullcalendar_theme').disabled = isFour;

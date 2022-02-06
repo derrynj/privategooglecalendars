@@ -63,3 +63,7 @@ a.pgc-link {
 .pgc-public-calendar-table td, .pgc-public-calendar-table th {
   padding:0;
 }
+
+.pgc-copy-text {
+  cursor: pointer;
+}

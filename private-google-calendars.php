@@ -1385,7 +1385,7 @@ function pgc_settings_selected_calendar_ids_json_cb() {
             <span class="pgc-calendar-color" style="background-color:<?php echo esc_attr($calendar['backgroundColor']); ?>"></span>
             <?php echo esc_html($calendar['summary']); ?><?php if (!empty($calendar['primary'])) echo ' (primary)'; ?>
         </label>
-        <br>ID: <?php echo esc_html($calendarId); ?>
+        <br>ID: <a tabindex="0" class="pgc-copy-text" title="<?php _e('Copy to clipboard', 'private-google-calendars'); ?>"><?php echo esc_html($calendarId); ?></a>
       </p>
     <?php } ?>
     </ul>
