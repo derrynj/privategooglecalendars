@@ -3,13 +3,22 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import { CheckboxControl, PanelBody, TextControl, TextareaControl, Modal, HorizontalRule, SelectControl } from '@wordpress/components';
 
-const defaultFullcalendarConfig = JSON.stringify({
-    header: {
-        left: "prev,next today",
-        center: "title",
-        right: "dayGridMonth,timeGridWeek,listWeek"
+
+const defaultFullcalendarConfig = JSON.stringify(window.pgc_trans.fullcalendar_version >= 5 ?
+    {
+        headerToolbar: {
+            start: "prev,next today",
+            center: "title",
+            end: "dayGridMonth,timeGridWeek,listWeek"
+        }
     }
-}, null, 2);
+    : {
+        header: {
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,listWeek"
+        }
+    }, null, 2);
 
 function getNewUpdatedObject(obj, objName, key, newValue) {
     const copy = Object.assign({}, obj);
@@ -380,7 +389,7 @@ registerBlockType('pgc-plugin/calendar', {
                 try {
                     hasValidConfig = fullcalendarconfig && Object.keys(JSON.parse(fullcalendarconfig)).length > 0;
                 } catch (ex) {
-        
+
                 }
                 if (hasValidConfig) {
                     attrsArray.push(`fullcalendarconfig='${fullcalendarconfig}'`);
@@ -392,10 +401,10 @@ registerBlockType('pgc-plugin/calendar', {
                         attrsArray.push(key + '="' + (config[key] ? 'true' : 'false') + '"');
                     }
                 });
-        
+
                 attrsArray.push(`hidepassed="${hideoptions.hidepassed ? hideoptions.hidepasseddays : 'false'}"`);
                 attrsArray.push(`hidefuture="${hideoptions.hidefuture ? hideoptions.hidefuturedays : 'false'}"`);
-        
+
                 if (props.attributes.publiccalendarids || Object.keys(props.attributes.calendars).length) {
                     attrs.calendarids = props.attributes.publiccalendarids;
                     if (Object.keys(props.attributes.calendars).length) {
@@ -408,18 +417,18 @@ registerBlockType('pgc-plugin/calendar', {
                         attrs.calendarids += (attrs.calendarids.length && calendarids.length ? "," : "") + calendarids.join(",");
                     }
                 }
-        
+
                 // Only if present set to save function.
                 // This means we don't have to use a deprecated version for this, because in previous versions this was not present
                 // and thus not displayed in save object.
                 if (props.attributes.uncheckedcalendarids) {
                     attrs.uncheckedcalendarids = props.attributes.uncheckedcalendarids;
                 }
-        
+
                 Object.keys(attrs).forEach(function (key) {
                     attrsArray.push(key + '="' + attrs[key] + '"');
                 });
-        
+
                 return <p>[pgc {attrsArray.join(" ")}]</p>
             },
         },

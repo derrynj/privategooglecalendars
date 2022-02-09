@@ -68,6 +68,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20220209 =
+* Set default FullCalendar 5 config if using FC version 5
+
 = 20220206 =
 * Themes and overridable themes per calendar
 

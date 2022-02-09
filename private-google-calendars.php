@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20220206
+Version: 20220209
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20220206');
+define('PGC_PLUGIN_VERSION', '20220209');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -188,7 +188,8 @@ function pgc_register_block() {
     'plugin_version' => PGC_PLUGIN_VERSION,
     'theme' => __('Theme', 'private-google-calendars'),
     'default' => __('Default', 'private-google-calendars'),
-    'themes' => pgc_get_themes()
+    'themes' => pgc_get_themes(),
+    'fullcalendar_version' => get_option('pgc_fullcalendar_version', 4)
   ];
 
   wp_add_inline_script('pgc-plugin-script', 'window.pgc_selected_calendars=' . json_encode($selectedCalendars) . ';', 'before');
@@ -202,6 +203,8 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   if (!is_array($atts)) {
     $atts = [];
   }
+
+  $fcVersion = get_option('pgc_fullcalendar_version', 4);
   
   // Very wierd: you can enter uppercase in attribute name
   // but after parsing they will have all lowercase...
@@ -215,7 +218,13 @@ function pgc_shortcode($atts = [], $content = null, $tag) {
   // [pgc header-left="today" header-center="title"] which becomes:
   // ['header' => ['left' => 'today', 'center' => 'title']]
   // 'header' is called in FC5 'headerToolbar' (and 'footer' to 'footerToolbar')
-  $defaultConfig = [
+  $defaultConfig = $fcVersion >= 5 ? [
+    'headerToolbar' => [
+      'start' => 'prev,next today',
+      'center' => 'title',
+      'end' => 'dayGridMonth,timeGridWeek,listWeek'
+    ]
+  ] : [
     'header' => [
       'left' => 'prev,next today',
       'center' => 'title',
@@ -1591,16 +1600,37 @@ function pgc_show_notice($notice, $type, $dismissable) {
   <?php
 }
 
-class Pgc_Calendar_Widget extends WP_Widget {
+function pgc_get_default_fc_config() {
 
-  private static $defaultConfig = [
-    // 'header' is called in FC5 'headerToolbar' (and 'footer' to 'footerToolbar')
+  $fcVersion = get_option('pgc_fullcalendar_version', 4);
+  return $fcVersion >= 5 ? [
+    'headerToolbar' => [
+      'start' => 'prev,next today',
+      'center' => 'title',
+      'end' => 'dayGridMonth,timeGridWeek,listWeek'
+    ]
+  ] : [
     'header' => [
       'left' => 'title',
       'center' => '',
       'right' => 'today prev,next',
     ],
   ];
+}
+
+class Pgc_Calendar_Widget extends WP_Widget {
+
+  private static $defaultConfig = null;
+
+  private static function getDefaultConfig() {
+    
+    if (!empty($defaultConfig)) return $defaultConfig;
+
+    $fcVersion = get_option('pgc_fullcalendar_version', 4);
+    $defaultConfig = pgc_get_default_fc_config();
+
+    return $defaultConfig;
+  }
   
   public function __construct() {
     parent::__construct(
@@ -1642,7 +1672,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $hidepasseddays = empty($instance['hidepasseddays']) ? 0 : $instance['hidepasseddays'];
     $hidefuture = $this->instanceOptionToBooleanString($instance, 'hidefuture', 'false');
     $hidefuturedays = empty($instance['hidefuturedays']) ? 0 : $instance['hidefuturedays'];
-    $config = isset($instance['config']) ? $instance['config'] : self::$defaultConfig;
+    $config = isset($instance['config']) ? $instance['config'] : self::getDefaultConfig();
 
     // START FIX calids
     // Fix for old users who used the thiscalendarids property (no selection meant ALL private calendars)
@@ -1727,7 +1757,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $hidefutureValue = isset($instance['hidefuture']) ? $instance['hidefuture'] === 'true' : false;
     $hidefuturedaysValue = empty($instance['hidefuturedays']) ? 0 : $instance['hidefuturedays'];
     
-    $jsonValue = !empty($instance['config']) ? $instance['config'] : self::$defaultConfig;
+    $jsonValue = !empty($instance['config']) ? $instance['config'] : self::getDefaultConfig();
     
     $allCalendarIds = get_option('pgc_selected_calendar_ids', []); // selected calendar ids
     // Can also be an empty string.
@@ -1919,7 +1949,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     
     <?php
 
-    $jsonExample = self::$defaultConfig;
+    $jsonExample = self::getDefaultConfig();
 
     $jsonValueTextarea = '';
     if (is_array($jsonValue)) {
@@ -2023,7 +2053,7 @@ class Pgc_Calendar_Widget extends WP_Widget {
     $instance = [];
     $instance['config'] = (!empty($new_instance['config']))
         ? $new_instance['config']
-        : getPrettyJSONString(self::$defaultConfig);
+        : getPrettyJSONString(self::getDefaultConfig());
     $instance['filter'] = (!empty($new_instance['filter']))
         ? strip_tags($new_instance['filter'] )
         : ''; 
