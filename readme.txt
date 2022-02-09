@@ -14,7 +14,7 @@ Display multiple private and public Google Calendars
 
 This plugin can display multiple private (and public) Google calendars with a shortcode, Gutenberg block or as a widget.
 
-See the [webpage](https://michielvaneerd.github.io/privategooglecalendars/) for more information.
+See the [webpage](https://blog.michielvaneerd.nl/wordpress-plugins/private-google-calendars/) for more information.
 
 = Features =
 
@@ -52,19 +52,25 @@ This usually means you don't have a valid access or refresh token anymore. This 
 
 = I get an 'Error: redirect_uri_mismatch' error when I want to authorize =
 
-This means that you didn't add your current URL [YOURWEBSITE]/wp-admin/options-general.php?page=pgc to the authorized redirect URIs. See the [website](https://blog.michielvaneerd.nl/private-google-calendars/) for more information.
+This means that you didn't add your current URL [YOURWEBSITE]/wp-admin/options-general.php?page=pgc to the authorized redirect URIs. See the [website](https://blog.michielvaneerd.nl/wordpress-plugins/private-google-calendars/) for more information.
 
 = W3 Total Cache =
 
 If you use W3 Total Cache and have minify JS enabled, make sure that you do one of the following:
 Choose "Combine only" in the "Minify" settings.
 OR
-Enter the following files in the "Never minify the following JS files" textbox: fullcalendar.min.js and locale-all.js. Make sure you add the full path to these files from the root of your installation, so if your Wordpress website is located in the wordpress directory, this will be:
+Enter the following files in the "Never minify the following JS files" textbox.
+Make sure you add the full path to these files from the root of your installation, so if your Wordpress website is located in the wordpress directory, this will be (for FullCalendatr 5):
+
+`wordpress/wp-content/plugins/private-google-calendars/lib/dist/main.js`
+
+And for FullCalendar 4:
 
 `wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/core/main.min.js
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/core/locales-all.min.js
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/list/main.min.js
 wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid/main.min.js`
+
 
 == Changelog ==
 
