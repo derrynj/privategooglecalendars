@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 5.9
+Tested up to: 5.9.2
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
@@ -73,6 +73,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 
 == Changelog ==
+
+= 20220318 =
+* Fixed OAuth redirect takeover where we didn't check for the state parameter which could interfere with other plugins
 
 = 20220209 =
 * Set default FullCalendar 5 config if using FC version 5

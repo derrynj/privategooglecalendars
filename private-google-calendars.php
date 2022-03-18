@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20220209
+Version: 20220318
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20220209');
+define('PGC_PLUGIN_VERSION', '20220318');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -991,7 +991,7 @@ function pgc_admin_post_authorize() {
 
   try {
     $client = getGoogleClient();
-    $client->authorize();
+    $client->authorize(pgc_get_state_from_user());
     exit;
   } catch (Exception $ex) {
     pgc_die($ex);
@@ -1107,13 +1107,22 @@ function pgc_validate_client_secret_input($input) {
   return null;
 }
 
+function pgc_get_state_from_user() {
+  $user = wp_get_current_user();
+  return md5(serialize($user));
+}
+
 /**
  * Decide which settings to register.
  */
 add_action('admin_init', 'pgc_settings_init');
 function pgc_settings_init() {
 
-  if (!empty($_GET['code'])) {
+  // Important to first check state! Otherwise this can interfere with other plugins that do a redirect!
+  // https://wordpress.org/support/topic/state-mismatch-error-with-contact-form-7/
+  // And possibly also:
+  // https://wordpress.org/support/topic/conflict-with-other-plugins-that-connect-to-google/
+  if (!empty($_GET['code']) && !empty($_GET['state']) && $_GET['state'] === pgc_get_state_from_user()) {
     // Redirect from Google authorize with code that we can use to get access and refreh tokens.
     try {
       $client = getGoogleClient();

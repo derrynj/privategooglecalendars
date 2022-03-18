@@ -209,17 +209,16 @@ class PGC_GoogleClient {
     call_user_func($this->tokenCallback, $response, $refreshToken);
   }
 
-  public function handleCodeRedirect($state = '') {
+  public function handleCodeRedirect() {
     if (!empty($_GET['error'])) {
       throw new Exception($_GET['error']);
     }
     if (empty($_GET['code'])) {
       throw new Exception('Code missing');
     }
-    $getState = !empty($_GET['state']) ? $_GET['state'] : '';
-    if ($getState !== $state) {
-      throw new Exception("State mismatch.");
-    }
+    // if ($_GET['state'] !== $state) {
+    //   throw new Exception("State mismatch.");
+    // }
 
     $result = PGC_GoogleClient_Request::doRequest(self::GOOGLE_CODE_URI, [
       'code' => $_GET['code'],
@@ -234,7 +233,7 @@ class PGC_GoogleClient {
     $this->updateTokens($result);
   }
 
-  public function authorize($state = '') {
+  public function authorize($state) {
     $params = [
       'client_id' => $this->clientInfo['web']['client_id'],
       'scope' => $this->scope,

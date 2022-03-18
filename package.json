@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "wp-scripts start"
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,9 @@
   },
   "homepage": "https://github.com/michielvaneerd/privategooglecalendars#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^19.0.0"
+    "@wordpress/scripts": "^22.2.1"
+  },
+  "dependencies": {
+    "@wordpress/icons": "^8.0.1"
   }
 }
