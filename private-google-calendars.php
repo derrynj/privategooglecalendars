@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20220318
+Version: 20220603
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20220318');
+define('PGC_PLUGIN_VERSION', '20220603');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -26,6 +26,10 @@ if (!defined('PGC_EVENTS_MAX_RESULTS')) {
 
 if (!defined('PGC_EVENTS_DEFAULT_TITLE')) {
   define('PGC_EVENTS_DEFAULT_TITLE', '');
+}
+
+if (!defined('PGC_CALENDARS_MAX_RESULTS')) {
+  define('PGC_CALENDARS_MAX_RESULTS', 250);
 }
 
 // Priority for the enqueue css and javascript.
@@ -879,7 +883,7 @@ function pgc_admin_post_calendarlist() {
       $client->refreshAccessToken();
     }
     $service = new PGC_GoogleCalendarClient($client);
-    $items = $service->getCalendarList();
+    $items = $service->getCalendarList(PGC_CALENDARS_MAX_RESULTS);
 
     pgc_sort_calendars($items);
 
@@ -1130,7 +1134,7 @@ function pgc_settings_init() {
       // and call the tokencallback we have set to save them in the options table.
       $client->handleCodeRedirect();
       $service = new PGC_GoogleCalendarClient($client);
-      $items = $service->getCalendarList();
+      $items = $service->getCalendarList(PGC_CALENDARS_MAX_RESULTS);
       pgc_sort_calendars($items);
       update_option('pgc_calendarlist', getPrettyJSONString($items), false);
       wp_redirect(admin_url('options-general.php?page=pgc'));

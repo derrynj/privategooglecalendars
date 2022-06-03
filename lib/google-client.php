@@ -3,25 +3,27 @@
 /**
  * Exception with a description field.
  **/
-class PGC_GoogleClient_RequestException extends Exception {
-  
+class PGC_GoogleClient_RequestException extends Exception
+{
+
   private $description;
 
-  function __construct($message, $code = 0, $description = '') {
+  function __construct($message, $code = 0, $description = '')
+  {
     parent::__construct($message, $code, null);
     $this->description = $description;
-    
   }
-  public function getDescription() {
+  public function getDescription()
+  {
     return $this->description;
   }
-
 }
 
 /**
  * Class that can do a HTTP request.
  **/
-class PGC_GoogleClient_Request {
+class PGC_GoogleClient_Request
+{
 
   // See for example: https://developers.google.com/drive/v3/web/handle-errors
   private static $HTTP_CODES = [
@@ -31,7 +33,7 @@ class PGC_GoogleClient_Request {
     404 => 'Not found. The specified resource was not found.',
     500 => 'Backend error.'
   ];
-  
+
   /**
    * Does a HTTP request
    *
@@ -44,7 +46,8 @@ class PGC_GoogleClient_Request {
    *
    * @throws PGC_GoogleClient_RequestException
    **/
-  public static function doRequest($url, $params = [], $method = 'GET', $headers = []) {
+  public static function doRequest($url, $params = [], $method = 'GET', $headers = [])
+  {
 
     $args = [];
     if (!empty($headers)) {
@@ -61,17 +64,17 @@ class PGC_GoogleClient_Request {
           //$url = add_query_arg($params, $url); // wp variant, but I think you still have to urlencode it
         }
         $result = wp_remote_get($url, $args);
-      break;
+        break;
       case 'POST':
         if (!empty($params)) {
           $args['body'] = $params; // TODO: Do we have to urlencode these manually?
         }
         $result = wp_remote_post($url, $args);
-      break;
+        break;
       default:
         throw new PGC_GoogleClient_RequestException('Unknown request method.');
     }
-    
+
     if (empty($result)) {
       throw new PGC_GoogleClient_RequestException('Request failed.');
     }
@@ -116,22 +119,23 @@ class PGC_GoogleClient_Request {
 /**
  * The Google OAuth client class.
  **/
-class PGC_GoogleClient {
+class PGC_GoogleClient
+{
 
   /**
-  * Array of client_secret that can be downloaded from the google api console at:
-  * https://console.developers.google.com
-  **/
+   * Array of client_secret that can be downloaded from the google api console at:
+   * https://console.developers.google.com
+   **/
   private $clientInfo;
 
   /**
-  * @var array The access token info as an array that is returned by the Google API.
-  **/
+   * @var array The access token info as an array that is returned by the Google API.
+   **/
   private $accessTokenInfo;
 
   /**
-  * @var string The refreshtoken
-  **/
+   * @var string The refreshtoken
+   **/
   private $refreshToken;
 
   private $scope;
@@ -146,7 +150,8 @@ class PGC_GoogleClient {
   // So mostly after authorize phase (with reresh token) or after refresh token (only access token).
   private $tokenCallback;
 
-  function __construct($clientInfo, $accessTokenInfo = null, $refreshToken = null, $tokenCallback = null) {
+  function __construct($clientInfo, $accessTokenInfo = null, $refreshToken = null, $tokenCallback = null)
+  {
     $this->clientInfo = $clientInfo;
     $this->getAccessTokenInfo = $accessTokenInfo;
     $this->refreshToken = $refreshToken;
@@ -155,48 +160,58 @@ class PGC_GoogleClient {
     $this->redirectUri = null;
   }
 
-  public function setAccessTokenInfo($accessTokenInfo) {
+  public function setAccessTokenInfo($accessTokenInfo)
+  {
     $this->accessTokenInfo = $accessTokenInfo;
   }
 
-  public function getAccessTokenInfo() {
+  public function getAccessTokenInfo()
+  {
     return $this->accessTokenInfo;
   }
 
   // Helper
-  public function getAccessToken() {
+  public function getAccessToken()
+  {
     return $this->accessTokenInfo['access_token'];
   }
 
-  public function setRefreshToken($refreshToken) {
+  public function setRefreshToken($refreshToken)
+  {
     $this->refreshToken = $refreshToken;
   }
 
-  public function getRefreshToken() {
+  public function getRefreshToken()
+  {
     return $this->refreshToken;
   }
 
-  public function setTokenCallback($tokenCallback) {
+  public function setTokenCallback($tokenCallback)
+  {
     $this->tokenCallback = $tokenCallback;
   }
 
-  public function setScope($scope) {
+  public function setScope($scope)
+  {
     $this->scope = $scope;
   }
 
-  public function setRedirectUri($redirectUri) {
+  public function setRedirectUri($redirectUri)
+  {
     if (!in_array($redirectUri, $this->clientInfo['web']['redirect_uris'])) {
       throw new Exception('Redirect Uri does not exist in client info. Add it first to the project and download the JSON again.');
     }
     $this->redirectUri = $redirectUri;
   }
 
-  public function isAccessTokenExpired() {
+  public function isAccessTokenExpired()
+  {
     // Add 30 seconds, so we refresh them on time.
     return $this->accessTokenInfo['expire_time'] + 30 < time();
   }
 
-  private function updateTokens($response) {
+  private function updateTokens($response)
+  {
     // Compute when access token expires and add it to the info array.
     $response['expire_time'] = time() + $response['expires_in'];
     // Only after authorize we get a refresh token, so make sure to save it!
@@ -209,7 +224,8 @@ class PGC_GoogleClient {
     call_user_func($this->tokenCallback, $response, $refreshToken);
   }
 
-  public function handleCodeRedirect() {
+  public function handleCodeRedirect()
+  {
     if (!empty($_GET['error'])) {
       throw new Exception($_GET['error']);
     }
@@ -233,7 +249,8 @@ class PGC_GoogleClient {
     $this->updateTokens($result);
   }
 
-  public function authorize($state) {
+  public function authorize($state)
+  {
     $params = [
       'client_id' => $this->clientInfo['web']['client_id'],
       'scope' => $this->scope,
@@ -248,7 +265,8 @@ class PGC_GoogleClient {
     exit;
   }
 
-  public function refreshAccessToken() {
+  public function refreshAccessToken()
+  {
     $result = PGC_GoogleClient_Request::doRequest(
       self::GOOGLE_REFRESH_URI,
       [
@@ -265,7 +283,8 @@ class PGC_GoogleClient {
     $this->updateTokens($result);
   }
 
-  public function revoke() {
+  public function revoke()
+  {
     // Can be done with access and refresh token,
     // but as access tokens expire more frequent, first take refresh token.
     // It can take some time before the revoke is processed.
@@ -277,18 +296,20 @@ class PGC_GoogleClient {
       throw new Exception('No access and refresh token.');
     }
     $result = PGC_GoogleClient_Request::doRequest(
-      self::GOOGLE_REVOKE_URI, ['token' => $token]);
+      self::GOOGLE_REVOKE_URI,
+      ['token' => $token]
+    );
     // TODO: do we have 200 status code???
 
   }
-
 }
 
 // https://developers.google.com/google-apps/calendar/v3/reference/events/list
 /**
  * Class that can communicate with the Google Calendar API.
  **/
-class PGC_GoogleCalendarClient {
+class PGC_GoogleCalendarClient
+{
 
   const GOOGLE_CALENDAR_EVENTS_URI = 'https://www.googleapis.com/calendar/v3/calendars/$calendarId/events';
   const GOOGLE_CALENDER_PRIMARY_ID = 'primary';
@@ -299,11 +320,13 @@ class PGC_GoogleCalendarClient {
 
   private static $propsToGet = 'items(summary,description,start,end,htmlLink,creator,location,attendees,attachments,colorId,visibility)';
 
-  function __construct($client) {
+  function __construct($client)
+  {
     $this->googleClient = $client;
   }
 
-  public function getEvents($calendarId, $params) {
+  public function getEvents($calendarId, $params)
+  {
     $url = str_replace('$calendarId', urlencode($calendarId), self::GOOGLE_CALENDAR_EVENTS_URI);
     // https://developers.google.com/google-apps/calendar/performance#partial-response
     $params['fields'] = self::$propsToGet;
@@ -315,12 +338,13 @@ class PGC_GoogleCalendarClient {
         'Authorization' => 'Bearer ' . $this->googleClient->getAccessToken(),
       ]
     );
-    
+
     $parsed = !empty($result['items']) ? $result['items'] : [];
     return $parsed;
   }
 
-  public function getEventsPublic($calendarId, $params, $apiKey, $referer) {
+  public function getEventsPublic($calendarId, $params, $apiKey, $referer)
+  {
     $url = str_replace('$calendarId', urlencode($calendarId), self::GOOGLE_CALENDAR_EVENTS_URI);
     // https://developers.google.com/google-apps/calendar/performance#partial-response
     $params['fields'] = self::$propsToGet;
@@ -333,43 +357,64 @@ class PGC_GoogleCalendarClient {
         'Referer' => $referer
       ]
     );
-    
+
     $parsed = !empty($result['items']) ? $result['items'] : [];
     return $parsed;
   }
 
-  public function getPrimaryEvents($params) {
+  public function getPrimaryEvents($params)
+  {
     return $this->getEvents('primary', $params);
   }
 
+  private function getCalendarListArg($pageToken, $maxResults) {
+    $arg = [
+      'maxResults' => $maxResults, // API default = 100
+      'minAccessRole' => 'reader' // if 'owner', than you don't see calendars like national holidays.
+    ];
+    if (!empty($pageToken)) {
+      $arg['pageToken'] = $pageToken;
+    }
+    return $arg;
+  }
+
   /**
-  * @return JSON with items as key each item is calendarListEntry
-  * calendarListEntry:
-  * 'id' => string 'ehqelgh6hq4juqhjd79g4b5qkk@group.calendar.google.com' ==> use this for event list
-  * 'summary' => string 'Vakantierooster'
-  * 'description' => string 'Agenda voor de vakantierooster'
-  * 'backgroundColor' => string '#cd74e6'
-  * 'foregroundColor' => string '#000000'
-  * 'selected' => boolean true ==> alleen aanwezig als geselecteerd! Geeft aan of de gebruiker deze calendat in de Google ui aan heeft gezet
-  * 'primary' => boolean true ==> alleen aanwezig bij primary calendar!
-  * 'accessRole' => we can get events only for 'owner' items, so we only query these.
-  **/
-  public function getCalendarList() {
-    $result = PGC_GoogleClient_Request::doRequest(
+   * @return JSON with items as key each item is calendarListEntry
+   * calendarListEntry:
+   * 'id' => string 'ehqelgh6hq4juqhjd79g4b5qkk@group.calendar.google.com' ==> use this for event list
+   * 'summary' => string 'Vakantierooster'
+   * 'description' => string 'Agenda voor de vakantierooster'
+   * 'backgroundColor' => string '#cd74e6'
+   * 'foregroundColor' => string '#000000'
+   * 'selected' => boolean true ==> alleen aanwezig als geselecteerd! Geeft aan of de gebruiker deze calendat in de Google ui aan heeft gezet
+   * 'primary' => boolean true ==> alleen aanwezig bij primary calendar!
+   * 'accessRole' => we can get events only for 'owner' items, so we only query these.
+   **/
+  public function getCalendarList($maxResults)
+  {
+    $items = [];
+    $pageToken = null;
+    while (($result = PGC_GoogleClient_Request::doRequest(
       self::GOOGLE_CALENDARLIST_URI,
-      [
-        'minAccessRole' => 'reader' // if 'owner', than you don't see calendars like national holidays.
-      ],
+      $this->getCalendarListArg($pageToken, $maxResults),
       'GET',
       [
         'Authorization' => 'Bearer ' . $this->googleClient->getAccessToken()
       ]
-    );
-    $parsed = !empty($result['items']) ? $result['items'] : [];
-    return $parsed;
+    ))) {
+      if (!empty($result['items'])) {
+        $items = array_merge($items, $result['items']);
+      }
+      if (empty($result['nextPageToken'])) {
+        break;
+      }
+      $pageToken = $result['nextPageToken'];
+    }
+    return $items;
   }
 
-  public function getColorList() {
+  public function getColorList()
+  {
     $result = PGC_GoogleClient_Request::doRequest(
       self::GOOGLE_COLORLIST_URI,
       null,
@@ -385,8 +430,4 @@ class PGC_GoogleCalendarClient {
       'event' => $event
     ];
   }
-
 }
-
-
-
