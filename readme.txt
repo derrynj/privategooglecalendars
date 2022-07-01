@@ -74,6 +74,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20220701 =
+* Fix for depracation warning in PHP 8: required parameter cannot follow optional parameter in PHP 8.
+* Update NPM packages.
+
 = 20220603 =
 * Loop through calendarList if there are more calendars
 * You can set the maximum number of calendars in the PGC_CALENDARS_MAX_RESULTS constant (you can set this in the wp-config.php file). Max = 250.

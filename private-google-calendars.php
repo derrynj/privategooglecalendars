@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20220603
+Version: 20220701
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20220603');
+define('PGC_PLUGIN_VERSION', '20220701');
 
 if (!class_exists('PGC_GoogleClient')) {
   require_once(plugin_dir_path(__FILE__) . 'lib/google-client.php');
@@ -201,7 +201,7 @@ function pgc_register_block() {
 
 }
 
-function pgc_shortcode($atts = [], $content = null, $tag) {
+function pgc_shortcode($atts = []) {
 
   // When we have no attributes, $atts is an empty string
   if (!is_array($atts)) {
