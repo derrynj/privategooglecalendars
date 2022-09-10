@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20220701
+Version: 20220910
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -598,15 +598,17 @@ function pgc_ajax_get_calendar() {
     }
 
     $showPrivateEvents = get_option('pgc_show_private_events');
+    $privateEventsTitle = get_option('pgc_private_events_title');
     
     $items = [];
     foreach ($results as $calendarId => $events) {
       foreach ($events as $item) {
-        if (empty($showPrivateEvents) && array_key_exists('visibility', $item) && $item['visibility'] === 'private') {
+        $isPrivate = array_key_exists('visibility', $item) && $item['visibility'] === 'private';
+        if (empty($showPrivateEvents) && $isPrivate) {
           continue;
         }
         $newItem = [
-          'title' => empty($item['summary']) ? PGC_EVENTS_DEFAULT_TITLE : $item['summary'],
+          'title' => $isPrivate && !empty($privateEventsTitle) ? $privateEventsTitle : ( empty($item['summary']) ? PGC_EVENTS_DEFAULT_TITLE : $item['summary'] ),
           'htmlLink' => $item['htmlLink'],
           'description' => !empty($item['description']) ? $item['description'] : '',
           'calId' => $calendarId,
@@ -1189,6 +1191,9 @@ function pgc_settings_init() {
     register_setting('pgc', 'pgc_show_private_events', [
       'show_in_rest' => false
     ]);
+    register_setting('pgc', 'pgc_private_events_title', [
+      'show_in_rest' => false
+    ]);
     register_setting('pgc', 'pgc_fullcalendar_version', [
       'show_in_rest' => false
     ]);
@@ -1276,6 +1281,19 @@ function pgc_settings_init() {
     'pgc',
     'pgc_settings_section_always'
   );
+
+  add_settings_field(
+    'pgc_settings_private_events_title',
+    __('Private events title', 'private-google-calendars'),
+    function() {
+      $privateEventsTitle = get_option('pgc_private_events_title');
+      ?>
+        <input type="text" name="pgc_private_events_title" id="pgc_private_events_title" value="<?php echo esc_attr($privateEventsTitle); ?>" />
+        <p><em><?php _e('Show this title for private events instead of the real title', 'private-google-calendars'); ?></em></p>
+      <?php
+    },
+    'pgc',
+    'pgc_settings_section_always');
 
   add_settings_field(
     'pgc_settings_fullcalendar_version',

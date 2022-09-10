@@ -327,20 +327,32 @@ class PGC_GoogleCalendarClient
 
   public function getEvents($calendarId, $params)
   {
+    $pageToken = null;
+    $items = [];
     $url = str_replace('$calendarId', urlencode($calendarId), self::GOOGLE_CALENDAR_EVENTS_URI);
     // https://developers.google.com/google-apps/calendar/performance#partial-response
     $params['fields'] = self::$propsToGet;
-    $result = PGC_GoogleClient_Request::doRequest(
+    if (!empty($pageToken)) {
+      $params['pageToken'] = $pageToken;
+    }
+    while (($result = PGC_GoogleClient_Request::doRequest(
       $url,
       $params,
       'GET',
       [
         'Authorization' => 'Bearer ' . $this->googleClient->getAccessToken(),
       ]
-    );
+    ))) {
+      if (!empty($result['items'])) {
+        $items = array_merge($items, $result['items']);
+      }
+      if (empty($result['nextPageToken'])) {
+        break;
+      }
+      $pageToken = $result['nextPageToken'];
+    }
 
-    $parsed = !empty($result['items']) ? $result['items'] : [];
-    return $parsed;
+    return $items;
   }
 
   public function getEventsPublic($calendarId, $params, $apiKey, $referer)

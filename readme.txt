@@ -74,6 +74,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20220910 =
+* Get more events by setting the PGC_EVENTS_MAX_RESULTS constant in wp-config.php
+* Setting a default private event title
+
 = 20220701 =
 * Fix for depracation warning in PHP 8: required parameter cannot follow optional parameter in PHP 8.
 * Update NPM packages.
