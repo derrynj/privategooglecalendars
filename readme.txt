@@ -74,6 +74,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20220915 =
+* Version constant in previous version (20220910) was not updated. This could cause some files not correctly updated from the cache. This is now fixed.
+
 = 20220910 =
 * Get more events by setting the PGC_EVENTS_MAX_RESULTS constant in wp-config.php
 * Setting a default private event title
