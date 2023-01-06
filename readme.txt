@@ -32,6 +32,10 @@ See the [webpage](https://blog.michielvaneerd.nl/wordpress-plugins/private-googl
 
 == Frequently Asked Questions ==
 
+= I get de-authorised every 1 or 2 weeks =
+
+This is because your Google Cloud project is still in the "Testing" publishing status. Make sure to set it to "Production".
+
 = Important notes for users who upgraded to 20200902 and experience differences =
 
 The 20200902 update makes it possible to display private and public Google calendars at the same time in the same widget, shortcode or Gutenberg block.
