@@ -411,8 +411,8 @@ function pgc_enqueue_scripts() {
   
   if ($fullcalendarVersion >= 5) {
     // Load new FullCalendar 5 files
-    wp_enqueue_style('pgc_main',
-      plugin_dir_url(__FILE__) . 'lib/dist/main.css', null, PGC_PLUGIN_VERSION);
+    // wp_enqueue_style('pgc_main',
+    //   plugin_dir_url(__FILE__) . 'lib/dist/main.css', null, PGC_PLUGIN_VERSION);
     if (!empty($fullcalendarTheme)) {
       wp_enqueue_style('pgc_theme',
         plugin_dir_url(__FILE__) . 'css/themes/' . $fullcalendarTheme . '.css', null, PGC_PLUGIN_VERSION);
