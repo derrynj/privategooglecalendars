@@ -78,6 +78,10 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20230107 =
+* FullCalendar 6
+* Event popups now keyboard accessible (by using 'focus' trigger)
+
 = 20220915 =
 * Version constant in previous version (20220910) was not updated. This could cause some files not correctly updated from the cache. This is now fixed.
 
