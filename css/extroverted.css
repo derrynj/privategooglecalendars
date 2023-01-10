@@ -1,0 +1,129 @@
+/*
+The class .pgc-theme-extroverted is attached to the root .pgc-calendar-wrapper element, so this can be used to 
+*/
+
+.pgc-calendar-wrapper.pgc-theme-extroverted {
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted {
+    background-color: brown;
+}
+
+/* .pgc-calendar-wrapper.pgc-theme-dark .fc .fc-toolbar-title {
+    font-size: 1.4rem;
+} */
+
+/* .pgc-calendar-wrapper.pgc-theme-dark .fc .fc-button,
+.pgc-calendar-wrapper.pgc-theme-dark .fc .fc-button .fc-icon,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-popover-header {
+    font-size: 1rem;
+} */
+
+/* .pgc-calendar-wrapper.pgc-theme-dark table.fc-list-table,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-dayGridMonth-view .fc-daygrid-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timeGridWeek-view .fc-daygrid-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timegrid-event,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-daygrid-day-number,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-col-header-cell,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-daygrid-more-link,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timegrid-slot-label-cushion.fc-scrollgrid-shrink-cushion,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-timegrid-axis-cushion.fc-scrollgrid-shrink-cushion.fc-scrollgrid-sync-inner,
+.pgc-calendar-wrapper.pgc-theme-dark .fc-daygrid-event-harness  {
+    font-size: .8rem;
+} */
+
+/* Colors, maybe better to leave this alone (users can override it in WP admin if they want) */
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc a,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc-toolbar-title,
+.pgc-calendar-wrapper.pgc-theme-extroverted .pgc-calendar-filter-wrapper label,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc-list-event,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc-popover-header {
+    color: white;
+}
+
+/* .pgc-calendar-wrapper.pgc-theme-dark .fc .fc-day-other .fc-daygrid-day-top {
+    opacity: .6;
+} */
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-daygrid-day.fc-day-today,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-timegrid-col.fc-day-today {
+    background-color: darkred;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc-theme-standard .fc-list-day-cushion {
+    background-color: darkviolet;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted tr.fc-list-event.fc-event:hover>td {
+    background-color: gold !important;
+    color: black;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted tr.fc-list-event.fc-event:hover>td a {
+    color: black;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary {
+    background-color: crimson;
+    border-color: red;
+    color: white;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:hover,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:active,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:focus {
+    background-color: darkmagenta !important;
+    border-color: red;
+    color: white;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:not(:disabled).fc-button-active,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:not(:disabled):active {
+    background-color: darkmagenta !important;
+    border-color: red;
+    color: white;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:active,
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:focus {
+    outline: 2px solid pink;
+}
+
+.pgc-calendar-wrapper.pgc-theme-extroverted .fc .fc-button-primary:disabled {
+    background-color: darkmagenta !important;
+    border-color: red;
+    color: white;
+    opacity: .6;
+}
+
+.tippy-box[data-theme~='extroverted'] {
+    background-color: deeppink;
+    color: gold;
+    box-shadow: 0 0 20px 4px rgb(154 161 177 / 15%), 0 4px 80px -8px rgb(36 40 47 / 25%), 0 4px 4px -2px rgb(91 94 105 / 15%);
+}
+
+.tippy-box[data-theme~='extroverted'][data-placement^='top']>.tippy-arrow::before {
+    border-top-color: deeppink;
+}
+
+.tippy-box[data-theme~='extroverted'][data-placement^='bottom']>.tippy-arrow::before {
+    border-bottom-color: deeppink;
+}
+
+.tippy-box[data-theme~='extroverted'][data-placement^='left']>.tippy-arrow::before {
+    border-left-color: deeppink;
+}
+
+.tippy-box[data-theme~='extroverted'][data-placement^='right']>.tippy-arrow::before {
+    border-right-color: deeppink;
+}
+
+.tippy-box[data-theme~='extroverted'] .tippy-content {
+    padding:1.6rem;
+}
+
+.tippy-box[data-theme~='extroverted'] .pgc-popup-draghandle {
+    display: none;
+}
