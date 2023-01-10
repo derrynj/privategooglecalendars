@@ -1504,7 +1504,7 @@ function pgc_settings_init()
     </select>
     <p>
       <em><?php printf(_('Place CSS files into uploads/%s directory to use custom themes.', 'private-google-calendars'), PGC_THEMES_DIR_NAME); ?></em><br>
-      <a target="_blank" href="<?php echo (plugin_dir_url(__FILE__) . 'css/extroverted.css'); ?>"><?php _e('Example CSS file'); ?></a>
+      <a target="_blank" href="<?php echo (plugin_dir_url(__FILE__) . 'css/redbrown.css'); ?>"><?php _e('Example CSS file'); ?></a>
     </p>
   <?php
     },
