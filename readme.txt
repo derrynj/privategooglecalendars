@@ -78,9 +78,11 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
-= 20230107 =
+= 20230111 =
 * FullCalendar 6
 * Event popups now keyboard accessible (by using 'focus' trigger)
+* Removed Tippy theme - this can now be set in a custom theme
+* Moved custom themes dir to uploads dir so custom themes are preserved when updating this plugin
 
 = 20220915 =
 * Version constant in previous version (20220910) was not updated. This could cause some files not correctly updated from the cache. This is now fixed.
