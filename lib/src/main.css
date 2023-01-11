@@ -1,14 +1,19 @@
-tr[data-tippy-content] {
+/* Visualize that we can click on an event with tippy content */
+a.fc-event[data-tippy-content],
+td.fc-list-event-title a[data-tippy-content] {
   cursor: pointer;
 }
 
+/* Not sure what this does... */
 .pgc-calendar-wrapper *,
 .pgc-calendar-wrapper *::before,
 .pgc-calendar-wrapper *::after {
   word-break: initial;
 }
 
-/* Start calendar filter styled checkboxes */
+/**********************************
+ * Start calendar filter checkboxes
+ **********************************/
 .pgc-calendar-filter input[type=checkbox]:focus+label span,
 .pgc-calendar-filter input[type=checkbox]:active+label span {
   outline: 1px dashed black;
@@ -54,22 +59,35 @@ tr[data-tippy-content] {
   margin-top: 1rem;
 }
 
+/* End calendar filter checkboxes */
+
+
+
+/*****************************************************
+ * Start tippy content basic styling
+ * This can be overruled or detailed in a custom theme
+ *****************************************************/
+.tippy-content {
+  padding: 1rem;
+}
+
 .pgc-event-title {
   font-size: large;
   font-weight: 500;
 }
 
 .pgc-popup-row-icon {
-  width: 30px;
+  width: 2rem;
   float: left;
 }
 
-.pgc-event-title .pgc-popup-row-value {
-  margin-right: 20px;
+.pgc-popup-row-value {
+  margin-left: 2rem;
 }
 
-.pgc-popup-row-value {
-  margin-left: 30px;
+.pgc-event-title .pgc-popup-row-value {
+  margin-right: 3rem;
+  margin-left: 0;
 }
 
 .pgc-popup-row {
@@ -86,11 +104,17 @@ tr[data-tippy-content] {
 
 .pgc-popup-draghandle {
   position: absolute;
-  right: 5px;
-  top: 5px;
+  right: 1rem;
+  top: 1rem;
   cursor: move;
   opacity: .4;
 }
+
+/* End tippy content basic styling */
+
+/*************************
+ * Start loading and error
+ *************************/
 
 .pgc-loading-el,
 .pgc-error-el {
@@ -99,7 +123,7 @@ tr[data-tippy-content] {
   padding: 1rem;
   left: 0;
   top: 0;
-  opacity: .6;
+  opacity: .8;
   z-index: 1000;
 }
 
@@ -108,28 +132,9 @@ tr[data-tippy-content] {
   opacity: 1;
 }
 
-.fc-h-event {
-  border: none;
-}
-
-.fc-event {
-  cursor: pointer;
-}
-
-.pgc-calendar-wrapper .fc a {
-  text-decoration: none;
-}
-
-/* Some WP themes (like 2019) add margin-bottom to table */
-.fc table {
-  margin: 0;
-}
-
-/* If I use "eventDisplay": "block" then the times of timed events are almost not visible because there are cutted off */
-.fc-h-event .fc-event-time {
-  overflow: visible;
-}
-
+/*********************************************************************
+ * On small screens the title and buttons need to get below each other
+ *********************************************************************/
 @media(max-width:649px) {
   .fc .fc-toolbar.fc-header-toolbar {
     margin-bottom: .6rem;
@@ -145,6 +150,6 @@ tr[data-tippy-content] {
   }
 
   .fc-toolbar>div {
-    margin-bottom: .6rem;
+    margin-bottom: 1rem;
   }
 }

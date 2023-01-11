@@ -1,3 +1,5 @@
+/* This is for FC 4 */
+
 .pgc-calendar-wrapper *, .pgc-calendar-wrapper *::before, .pgc-calendar-wrapper *::after {
     word-break: initial;
 }

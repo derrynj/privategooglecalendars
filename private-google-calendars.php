@@ -131,7 +131,7 @@ function pgc_get_themes()
   $files = scandir(pgc_get_themes_dir());
   if (is_dir(pgc_get_custom_themes_dir())) {
     $files = array_merge($files, scandir(pgc_get_custom_themes_dir()));
-  }  
+  }
   foreach ($files as $file) {
     if (preg_match("/^(.+)\.css$/", $file, $matches)) {
       $themes[] = $matches[1];
@@ -446,33 +446,8 @@ function pgc_enqueue_scripts()
   wp_enqueue_style('dashicons');
 
   $fullcalendarVersion = get_option('pgc_fullcalendar_version');
-  $tippyTheme = get_option('pgc_tippy_theme');
 
   if ($fullcalendarVersion >= 5) {
-    // Load new FullCalendar 5 files
-    // wp_enqueue_style('pgc_main',
-    //   plugin_dir_url(__FILE__) . 'lib/dist/main.css', null, PGC_PLUGIN_VERSION);
-    // if (!empty($fullcalendarTheme)) {
-    //   wp_enqueue_style(
-    //     'pgc_theme',
-    //     plugin_dir_url(__FILE__) . 'css/themes/' . $fullcalendarTheme . '.css',
-    //     null,
-    //     PGC_PLUGIN_VERSION
-    //   );
-    // } else {
-    //   wp_enqueue_style(
-    //     'pgc_theme',
-    //     plugin_dir_url(__FILE__) . 'css/themes/dark.css',
-    //     null,
-    //     PGC_PLUGIN_VERSION
-    //   );
-    //   wp_enqueue_style(
-    //     'pgc_theme',
-    //     plugin_dir_url(__FILE__) . 'css/themes/light.css',
-    //     null,
-    //     PGC_PLUGIN_VERSION
-    //   );
-    // }
     wp_enqueue_script(
       'pgc_main',
       plugin_dir_url(__FILE__) . 'lib/dist/main.js',
@@ -1333,7 +1308,7 @@ function pgc_settings_init()
     'pgc_settings_section_public',
     __('Public calendar settings', 'private-google-calendars'),
     function () {
-      _e('Access to public calendars require an API key.<br><strong>Note: using an API key to access calendars is not officially supported by Google so use it at your own risk!</strong>', 'private-google-calendars');
+      _e('Access to public calendars require an API key.<br><em><strong>Note: using an API key to access calendars is not officially supported by Google so use it at your own risk!</strong></em>', 'private-google-calendars');
     }, // leeg
     'pgc'
   ); // page, slug
@@ -1482,7 +1457,7 @@ function pgc_settings_init()
       <option value="4" <?php selected($version, '4', true); ?>>4</option>
       <option value="5" <?php selected($version, '5', true); ?>>6</option><!-- So we display 6, but use 5, this is because 5 is replaced by 6 -->
     </select>
-    <p><em><?php _e('Version 4 will be deprecated in future releases.', 'private-google-calendars'); ?></em></p>
+    <p><em><strong style="color:red;"><?php _e('Version 4 will be removed in future releases!', 'private-google-calendars'); ?></strong></em></p>
   <?php
     },
     'pgc',
@@ -1503,7 +1478,7 @@ function pgc_settings_init()
       <?php echo implode("\n", $themes); ?>
     </select>
     <p>
-      <em><?php printf(_('Place CSS files into uploads/%s directory to use custom themes.', 'private-google-calendars'), PGC_THEMES_DIR_NAME); ?></em><br>
+      <em><?php printf(__('Place CSS files into uploads/%s directory to use custom themes.', 'private-google-calendars'), PGC_THEMES_DIR_NAME); ?></em><br>
       <a target="_blank" href="<?php echo (plugin_dir_url(__FILE__) . 'css/redbrown.css'); ?>"><?php _e('Example CSS file'); ?></a>
     </p>
   <?php

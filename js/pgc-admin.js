@@ -62,7 +62,6 @@
     function handleFCVersion(value) {
       var isFour = value == 4;
       document.getElementById('pgc_fullcalendar_theme').disabled = isFour;
-      document.getElementById('pgc_tippy_theme').disabled = isFour;
     }
 
     document.getElementById('pgc_fullcalendar_version').addEventListener('change', function () {
