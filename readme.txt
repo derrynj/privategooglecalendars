@@ -2,7 +2,7 @@
 Contributors: michielve
 Tags: calendar, google
 Requires at least: 4.6
-Tested up to: 6.0.2
+Tested up to: 6.1.1
 Requires PHP: 5.4.0
 Stable tag: trunk
 License: GPLv2 or later
