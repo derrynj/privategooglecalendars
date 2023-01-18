@@ -8,17 +8,19 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Display multiple private and public Google Calendars
+Display private and public Google Calendars on your Wordpress website.
 
 == Description ==
 
 __If you update to version 20230111, please note that__:
+
 * The theming has slightly been changed. Now there is distinction between bundled and custom themes.
 * The previously bundled dark and light themes have been renamed. So if you used these themes, you now have to manually update these themes to the new pgc-dark and pgc-light themes.
 * The popup theme has been removed. This can now be set in your custom theme.
+
 See for details about this release: https://blog.michielvaneerd.nl/wordpress-plugins/private-google-calendars/version-20230111-details/
 
-This plugin can display multiple private (and public) Google calendars with a shortcode, Gutenberg block or as a widget.
+This plugin can display multiple private and public Google calendars with a shortcode, Gutenberg block or as a widget.
 
 See the [webpage](https://blog.michielvaneerd.nl/wordpress-plugins/private-google-calendars/) for more information.
 
@@ -35,6 +37,12 @@ See the [webpage](https://blog.michielvaneerd.nl/wordpress-plugins/private-googl
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Settings->Private Google Calendars screen to configure the plugin
 4. See the Help tab in the settings screen for information about setting up the OAuth2 access and using the shortcode and/or widget.
+
+== Screenshots ==
+
+1. Dark themed calendar.
+2. Calendar with event detail popup.
+3. Blue themed calendar.
 
 == Frequently Asked Questions ==
 

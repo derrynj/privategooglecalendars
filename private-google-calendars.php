@@ -1305,15 +1305,6 @@ function pgc_settings_init()
   ); // page, slug
 
   add_settings_section(
-    'pgc_settings_section_public',
-    __('Public calendar settings', 'private-google-calendars'),
-    function () {
-      _e('Access to public calendars require an API key.<br><em><strong>Note: using an API key to access calendars is not officially supported by Google so use it at your own risk!</strong></em>', 'private-google-calendars');
-    }, // leeg
-    'pgc'
-  ); // page, slug
-
-  add_settings_section(
     'pgc_settings_section',
     __('Private calendar settings', 'private-google-calendars'),
     function () use ($clientSecret) {
@@ -1327,6 +1318,14 @@ function pgc_settings_init()
     },
     'pgc'
   ); // page
+
+  add_settings_section(
+    'pgc_settings_section_public',
+    __('Public calendar settings', 'private-google-calendars'),
+    function () {
+    }, // leeg
+    'pgc'
+  ); // page, slug
 
   register_setting('pgc', 'pgc_api_key', [
     'show_in_rest' => false
@@ -1359,7 +1358,7 @@ function pgc_settings_init()
       $setting = get_option('pgc_api_key');
     ?>
     <input id="pgc_api_key" type="text" name="pgc_api_key" class="regular-text" value="<?php echo isset($setting) ? esc_attr($setting) : ''; ?>">
-    <p class="description"><?php _e('If you only want to display public calendars, an API key is all you need.', 'private-google-calendars'); ?></p>
+    <p><em><strong style="color:red;"><?php _e('Support for the API key will be removed in the next release, because this is not officially supported by Google.', 'private-google-calendars'); ?></strong></em></p>
   <?php
     },
     'pgc',
@@ -1457,7 +1456,7 @@ function pgc_settings_init()
       <option value="4" <?php selected($version, '4', true); ?>>4</option>
       <option value="5" <?php selected($version, '5', true); ?>>6</option><!-- So we display 6, but use 5, this is because 5 is replaced by 6 -->
     </select>
-    <p><em><strong style="color:red;"><?php _e('Version 4 will be removed in future releases!', 'private-google-calendars'); ?></strong></em></p>
+    <p><em><strong style="color:red;"><?php _e('Version 4 will be removed in the next release, so make sure to upgrade before.', 'private-google-calendars'); ?></strong></em></p>
   <?php
     },
     'pgc',
