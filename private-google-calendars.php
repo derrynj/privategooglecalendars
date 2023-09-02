@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20230111
+Version: 20230902
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20230111');
+define('PGC_PLUGIN_VERSION', '20230902');
 
 if (!defined('PGC_THEMES_DIR_NAME')) {
   define('PGC_THEMES_DIR_NAME', 'pgc_themes');
@@ -1645,6 +1645,13 @@ function getDecoded($optionName, $default = null)
  */
 function getGoogleClient($withTokens = false)
 {
+
+  // Apparently the init callback is not done when deleting a plugin and therefore the constants are not defined which causes a fatal error.
+  // So at least make sure the constants are defined.
+  if (!defined('PGC_PLUGIN_NAME')) {
+    load_plugin_textdomain('private-google-calendars', FALSE, basename(dirname(__FILE__)) . '/languages/');
+    initTranslatedDefines();
+  }
 
   $authConfig = get_option('pgc_client_secret');
   if (empty($authConfig)) {
