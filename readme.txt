@@ -92,6 +92,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20240103 =
+* Fixed XSS Vulnerability
+
 = 20231125 =
 * Fullcalendar 6.1.9
 
