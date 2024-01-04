@@ -92,6 +92,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20240104 =
+* XSS vulnerability caused a bug, which is fixed in this release
+
 = 20240103 =
 * Fixed XSS Vulnerability
 
