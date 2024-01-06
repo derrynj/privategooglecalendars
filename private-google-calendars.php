@@ -3,7 +3,7 @@
 Plugin Name: Private Google Calendars
 Description: Display multiple private Google Calendars
 Plugin URI: http://blog.michielvaneerd.nl/private-google-calendars/
-Version: 20240104
+Version: 20240106
 Author: Michiel van Eerd
 Author URI: http://michielvaneerd.nl/
 License: GPL2
@@ -12,7 +12,7 @@ Domain Path: /languages
 */
 
 // Always set this to the same version as "Version" in header! Used for query parameters added to style and scripts.
-define('PGC_PLUGIN_VERSION', '20240104');
+define('PGC_PLUGIN_VERSION', '20240106');
 
 if (!defined('PGC_THEMES_DIR_NAME')) {
   define('PGC_THEMES_DIR_NAME', 'pgc_themes');
@@ -296,12 +296,6 @@ function pgc_shortcode($atts = [])
   // Get all non-fullcalendar known properties
   foreach ($atts as $key => $value) {
 
-    // Prevent cross site scripting
-    // Don't do this for fullcalendarconfig as this is for JSON which we get as a string, so esc_attr will make it useless. Later on we will do a json_decode.
-    if ($key !== 'fullcalendarconfig') {
-      $value = esc_attr($value);
-    }
-
     if ($key === 'public') {
       // This existsed in old versions, but we don't want it in our shortcode output, so skip it.
       continue;
@@ -403,33 +397,33 @@ function pgc_shortcode($atts = [])
     }
   }
 
-  $dataCalendarIds = '';
+  $calendarIdsAsArray = [];
   if (!empty($calendarIds)) {
-    $dataCalendarIds = 'data-calendarids=\'' . json_encode(array_map('trim', explode(',', $calendarIds))) . '\'';
+    // Note: calendarIds is a comma separated string so make it into an array.
+    $calendarIdsAsArray = array_map('trim', explode(',', $calendarIds));
   } else {
     $privateSettingsSelectedCalendarListIds = get_option('pgc_selected_calendar_ids', []);
     if (!empty($privateSettingsSelectedCalendarListIds)) {
-      $dataCalendarIds = 'data-calendarids=\'' . json_encode($privateSettingsSelectedCalendarListIds) . '\'';
+      // Note: privateSettingsSelectedCalendarListIds is already an array.
+      $calendarIdsAsArray = $privateSettingsSelectedCalendarListIds;
     }
   }
 
-  $dataUnchekedCalendarIds = '';
-  if (!empty($uncheckedCalendarIds)) {
-    $dataUnchekedCalendarIds = 'data-uncheckedcalendarids=\'' . json_encode(array_map('trim', explode(',', $uncheckedCalendarIds))) . '\'';
-  }
-
-  $filterHTML = '<div class="pgc-calendar-filter" ' . $dataUnchekedCalendarIds . '></div>';
+  // Note that this is used below 2 times, so we escape the attribute here and output this below.
+  $filterHTML = '<div class="pgc-calendar-filter" ' . (!empty($uncheckedCalendarIds) ? (' data-uncheckedcalendarids=\'' . esc_attr(json_encode(array_map('trim', explode(',', $uncheckedCalendarIds)))) . '\' ') : '') . '></div>';
 
   $activeTheme = pgc_get_current_theme($userTheme);
 
-  return '<div class="pgc-calendar-wrapper pgc-calendar-page ' . pgc_wrap_in_theme_class($activeTheme) . '">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
-    . $dataCalendarIds . ' data-filter=\'' . $userFilter . '\' data-eventpopup=\'' . $userEventPopup . '\' data-eventlink=\''
-    . $userEventLink . '\' data-eventdescription=\'' . $userEventDescription . '\' data-eventlocation=\''
-    . $userEventLocation . '\' data-eventattachments=\'' . $userEventAttachments . '\' data-eventattendees=\''
-    . $userEventAttendees . '\' data-eventcreator=\'' . $userEventCreator . '\' data-eventcalendarname=\''
-    . $userEventCalendarname . '\' data-hidefuture=\'' . $userHideFuture . '\' data-hidepassed=\''
-    . $userHidePassed . '\' data-config=\'' . json_encode($userConfig) . '\' data-locale="'
-    . get_locale() . '" data-theme="' . $activeTheme . '" class="pgc-calendar"></div>' . ($userFilter === 'bottom' ? $filterHTML : '') . '</div>';
+  // Note that filterHTML is already escaped above and consist of HTML so we cannot escape it below.
+  return '<div class="pgc-calendar-wrapper pgc-calendar-page ' . esc_attr(pgc_wrap_in_theme_class($activeTheme)) . '">' . ($userFilter === 'top' ? $filterHTML : '') . '<div '
+    . (!empty($calendarIdsAsArray) ? (' data-calendarids=\'' . esc_attr(json_encode($calendarIdsAsArray)) . '\' ') : '') . ' data-filter=\'' . esc_attr($userFilter) . '\' data-eventpopup=\'' . esc_attr($userEventPopup) . '\' data-eventlink=\''
+    . esc_attr($userEventLink) . '\' data-eventdescription=\'' . esc_attr($userEventDescription) . '\' data-eventlocation=\''
+    . esc_attr($userEventLocation) . '\' data-eventattachments=\'' . esc_attr($userEventAttachments) . '\' data-eventattendees=\''
+    . esc_attr($userEventAttendees) . '\' data-eventcreator=\'' . esc_attr($userEventCreator) . '\' data-eventcalendarname=\''
+    . esc_attr($userEventCalendarname) . '\' data-hidefuture=\'' . esc_attr($userHideFuture) . '\' data-hidepassed=\''
+    . esc_attr($userHidePassed) . '\' data-config=\'' . esc_attr(json_encode($userConfig)) . '\' data-locale="'
+    . get_locale() . '" data-theme="' . esc_attr($activeTheme) . '" class="pgc-calendar"></div>' . ($userFilter === 'bottom' ? $filterHTML : '') . '</div>';
+
 }
 
 /**

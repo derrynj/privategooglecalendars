@@ -92,6 +92,9 @@ wordpress/wp-content/plugins/private-google-calendars/lib/fullcalendar4/timegrid
 
 == Changelog ==
 
+= 20240106 =
+* Escape attributes during output.
+
 = 20240104 =
 * XSS vulnerability caused a bug, which is fixed in this release
 
